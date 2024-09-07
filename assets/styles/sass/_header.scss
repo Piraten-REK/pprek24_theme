@@ -159,6 +159,9 @@
       $selectors: list.append($selectors, &);
       --_padding-inline: .5em;
 
+      list-style-type: none;
+      position: relative;
+
       :where(a, button) {
         $selectors: list.append($selectors, &);
 
@@ -182,9 +185,6 @@
       &:has([aria-current]) > :where(a, button) {
         box-shadow: inset 0 -.2em 0 var(--clr-accent-400);
       }
-
-      list-style-type: none;
-      position: relative;
 
       & > ul {
         opacity: 0;
