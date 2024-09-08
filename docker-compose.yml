@@ -12,8 +12,8 @@ services:
       WORDPRESS_DB_NAME: exampledb
       WORDPRESS_DEBUG: true
     volumes:
-      - wp:/var/www/html
-      - pprek24:/var/www/html/wp-content/themes/pprek24
+      - ./wp:/var/www/html
+      - ./pprek24:/var/www/html/wp-content/themes/pprek24
 
   db:
     image: mysql:8.0
@@ -27,12 +27,4 @@ services:
       - db:/var/lib/mysql
 
 volumes:
-  wp:
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/veyxos/dev/pprek24_theme/wp
-      o: bind
   db:
-  pprek24:
-
