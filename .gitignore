@@ -1,3 +1,4 @@
 db/
-node_modules/
-assets/fonts/.gitignore
+wp/
+
+pprek24/assets/fonts/.gitignore
