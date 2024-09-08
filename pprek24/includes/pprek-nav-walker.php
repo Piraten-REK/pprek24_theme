@@ -51,7 +51,8 @@ class Pprek24_NavWalker extends Walker_Nav_Menu {
     $output .= '<a ' . join(' ', $attrs) . ' ' . ($depth > 0 ? 'tabindex="-1"' : '') . '>' . $item->title;
     
     if (pprek24_is_external_link($item->url)) {
-      $output .= ' ' . PPREK24_EXTERNAL_LINK_TAG;
+      global $pprek24_external_link_tag;
+      $output .= ' ' . $pprek24_external_link_tag;
     }
 
     $output .= '</a>';

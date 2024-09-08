@@ -38,4 +38,5 @@ function pprek24_is_external_link (string $href): bool {
   );
 }
 
-define('PPREK24_EXTERNAL_LINK_TAG', '<i aria-hidden="true" class="bi bi-box-arrow-up-right external-link-marker" title="' . esc_attr__('Externer Link', 'pprek24') . '"></i>');
+global $pprek24_external_link_tag;
+$pprek24_external_link_tag = '<i aria-hidden="true" class="bi bi-box-arrow-up-right external-link-marker" title="' . esc_attr__('Externer Link', 'pprek24') . '"></i>';
