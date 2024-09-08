@@ -19,4 +19,4 @@ foreach ($includes as $include) {
 
 // Hooks
 add_action('after_setup_theme', 'pprek24_setup_theme');
-add_action('wp_enqueue_scripts', 'pprek24_enqueue');
+add_action('wp_enqueue_scripts', pprek24_enqueue());

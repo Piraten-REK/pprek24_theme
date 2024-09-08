@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- PRELOADS -->
   <link rel="preload" href="<?php echo get_theme_file_uri('/assets/fonts/mulish.woff2') ?>" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="<?php echo get_theme_file_uri('/assets/fonts/mulish_italic.woff2') ?>" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="<?php echo get_theme_file_uri('/assets/fonts/bootstrap-icons.woff2') ?>" as="font" type="font/woff2" crossorigin>
+  <?php pprek24_preload_styles(); ?>
   <!-- FAVICON -->
   <meta name="referrer" content="same-origin">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="hsl(21 98% 40%)">
