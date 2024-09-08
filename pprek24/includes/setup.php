@@ -1,6 +1,6 @@
 <?php
 
-function pprek24_setup_theme () {
+function pprek24_setup_theme (): void {
   add_theme_support('post_thumbnails');
   add_theme_support('automatic-feed-links');
   add_theme_support('title-tag');

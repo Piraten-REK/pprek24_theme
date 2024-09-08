@@ -1,6 +1,6 @@
 <?php
 
-function pprek24_page_autor (string $default = 'PIRATEN Rhein-Erft-Kreis'): string {
+function pprek24_page_author (string $default = 'PIRATEN Rhein-Erft-Kreis'): string {
   return is_singular()
     ? get_the_author()
     : $default;
@@ -14,7 +14,7 @@ function pprek24_get_nav_menu_for_location (string $location): WP_Term | null {
   $locations = get_nav_menu_locations();
 
   if (!in_array($location, array_keys($locations))) {
-    throw new ErrorException("$location is not a valid location");
+    return null;
   }
 
   if (!isset($locations[$location])) {
@@ -38,4 +38,4 @@ function pprek24_is_external_link (string $href): bool {
   );
 }
 
-define('PPREK24_EXTERNAL_LINK_TAG', '<i aria-hidden="true" class="bi bi-box-arrow-up-right external-link-marker" title="' . esc_attr('Externer Link', 'pprek24') . '"></i>');
+define('PPREK24_EXTERNAL_LINK_TAG', '<i aria-hidden="true" class="bi bi-box-arrow-up-right external-link-marker" title="' . esc_attr__('Externer Link', 'pprek24') . '"></i>');

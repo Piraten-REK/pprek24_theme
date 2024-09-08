@@ -4,17 +4,17 @@ class Pprek24_NavWalker extends Walker_Nav_Menu {
   protected int $sub = 0;
   protected string $parentName = '_parent';
 
-  public function start_lvl (&$output, $depth = 0, $args = null) {
+  public function start_lvl (&$output, $depth = 0, $args = null): void {
     $output .= '<ul id="_site-nav_sub' . $this->sub . '" aria-labelledby="_site-nav_sub' . $this->sub . $this->parentName . '">';
   }
 
-  public function start_el (&$output, $item, $depth = 0, $args = null, $id = 0) {
+  public function start_el (&$output, $data_object, $depth = 0, $args = null, $current_object_id = 0): void {
     $output .= '<li>';
 
-    $this->render_el($output, $item, $depth, $args, $id);
+    $this->render_el($output, $data_object, $depth, $args, $current_object_id);
   }
 
-  protected function render_el (string &$output, WP_Post $item, int $depth, stdClass $args, int $id) {
+  protected function render_el (string &$output, WP_Post $item, int $depth, stdClass $args, int $id): void {
     // Separator
     if (str_starts_with($item->title, '---')) {
       $output .= '<hr>';
@@ -45,7 +45,7 @@ class Pprek24_NavWalker extends Walker_Nav_Menu {
         $value = esc_attr($value);
       }
 
-      array_push($attrs, $key . '="' . $value . '"');
+      $attrs[] = $key . '="' . $value . '"';
     }
 
     $output .= '<a ' . join(' ', $attrs) . ' ' . ($depth > 0 ? 'tabindex="-1"' : '') . '>' . $item->title;
@@ -57,11 +57,11 @@ class Pprek24_NavWalker extends Walker_Nav_Menu {
     $output .= '</a>';
   }
 
-  public function end_el (&$output, $item, $depth = 0, $args = null) {
+  public function end_el (&$output, $data_object, $depth = 0, $args = null): void {
     $output .= '</li>';
   }
 
-  public function end_lvl (&$output, $depth = 0, $args = null) {
+  public function end_lvl (&$output, $depth = 0, $args = null): void {
     $output .= '</ul>';
   }
 }

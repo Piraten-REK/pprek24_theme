@@ -3,7 +3,7 @@
 class Pprek24_PrimaryNavWalker extends Pprek24_NavWalker {
   protected string $parentName = '_btn';
 
-  protected function render_el (string &$output, WP_Post $item, int $depth, stdClass $args, int $id) {
+  protected function render_el (string &$output, WP_Post $item, int $depth, stdClass $args, int $id): void {
     // Labels
     $hasChildren = in_array('menu-item-has-children', $item->classes, true);
 

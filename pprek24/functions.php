@@ -1,7 +1,7 @@
 <?php
 
 // Setup
-define('PPREK_DEV_MODE', true);
+const PPREK_DEV_MODE = true;
 
 // INCLUDES
 $includes = [
