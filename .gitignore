@@ -2,3 +2,5 @@ db/
 wp/
 
 pprek24/assets/fonts/.gitignore
+node_modules/
+dist/

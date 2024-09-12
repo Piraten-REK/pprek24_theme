@@ -1,0 +1,35 @@
+name: 'Release'
+
+run-name: @${{ github.actor }} creates new release ${{ github.ref_name }}
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+  create:
+
+jobs:
+  checkout:
+    runs-on: 'ubuntu-latest'
+    if: ( github.ref_type == 'tag') && ( github.ref_name == 'v[0-9]+.[0-9]+.[0-9]+' )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.ref }}
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install PNPM
+        shell: bash
+        run:
+          wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
+      - name: Install dependencies
+        shell: bash
+        run:
+          pnpm i && cd pprek24 && pnpm i
+
+
+
+
