@@ -23,6 +23,7 @@ jobs:
           else
             echo "::error Invalid tag"
             echo "tag_valid=false" >> $GITHUB_ENV
+            exit 1
           fi
 
       - name: Checkout
@@ -38,12 +39,15 @@ jobs:
       - name: Install PNPM
         if: env.tag_valid == 'true'
         shell: bash
-        run:
-          wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
+        run: |
+          curl -fsSL https://get.pnpm.io/install.sh | bash -
+          export PNPM_HOME="/home/runner/.local/share/pnpm"
+          export PATH="$PNPM_HOME:$PATH"
+          echo "PNPM_HOME=/home/runner/.local/share/pnpm" >> $GITHUB_ENV
+          echo "PATH=$PNPM_HOME:$PATH" >> $GITHUB_ENV
 
       - name: Install dependencies
         if: env.tag_valid == 'true'
         shell: bash
         run: |
-          source $HOME/.bashrc
           pnpm i && cd pprek24 && pnpm i
