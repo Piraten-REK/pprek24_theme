@@ -3,7 +3,7 @@ const github = require('@actions/github')
 
 async function run () {
     try {
-        const GITHUB_TOKEN = core.getInput('myToken')
+        const GITHUB_TOKEN = core.getInput('GH_TOKEN') ?? process.env.GH_TOKEN
         const TAG_NAME = core.getInput('version')
 
         if (!GITHUB_TOKEN) {

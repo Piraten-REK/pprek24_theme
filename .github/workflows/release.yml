@@ -1,6 +1,6 @@
 name: 'Release'
 
-run-name: Release ${{ github.ref_name }}
+run-name: Release ${{ inputs.version }}
 
 on:
   workflow_dispatch:
@@ -56,6 +56,6 @@ jobs:
         if: env.tag_valid == 'true'
         shell: bash
         env:
-          myToken: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run:
           pnpm run create-release
