@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"build": "ncc build create-release.ts -o dist",
+		"build": "ncc build create-release.js -o dist",
 		"create-release": "pnpm run build && node dist/index"
 	},
 	"devDependencies": {
