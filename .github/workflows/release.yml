@@ -55,5 +55,7 @@ jobs:
       - name: Create Realease
         if: env.tag_valid == 'true'
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run:
           pnpm run create-release
