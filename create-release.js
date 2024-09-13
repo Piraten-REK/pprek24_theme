@@ -1,5 +1,6 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
+const os = require('os')
 
 const CHANGELOG_PATH = 'CHANGELOG.md'
 
@@ -76,7 +77,7 @@ function updateChangelog (currentChangelog, version) {
         ...input, ''
     )
 
-    return [newChangeLog.join('\n'), input]
+    return [newChangeLog.join('\n'), input.join('\n')]
 }
 
 /**
@@ -105,41 +106,68 @@ function updateChangelog (currentChangelog, version) {
 async function run () {
     try {
         const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
-        const TAG_NAME = core.getInput('version')
+        const version = core.getInput('version')
 
         if (!GITHUB_TOKEN) {
             throw new Error('GITHUB_TOKEN is not set.')
         }
 
+        const preRelease = core.getBooleanInput('preRelease')
+        const makeLatest = core.getBooleanInput('makeLatest')
+
         const octokit = github.getOctokit(GITHUB_TOKEN)
 
         const context = github.context ?? {}
 
+        const owner = context.payload.repository?.owner?.login
+        const repo = context.payload.repository?.name
+
+        if (owner == null || repo == null) {
+            throw new Error('Something went wrong')
+        }
+
+        // Get CHANGELOG
+
         /** @type {GetContent} */
         const changeLog = await octokit.rest.repos.getContent({
-            owner: context.payload.repository?.owner?.login,
-            repo: context.payload.repository?.name,
+            owner,
+            repo,
             ref: context.ref,
             path: CHANGELOG_PATH
         })
 
         const changeLogString = Buffer.from(changeLog.data.content, changeLog.data.encoding).toString('utf8')
 
-        console.log(changeLogString)
-
         const [newChangelog, changes] =  updateChangelog(changeLogString, TAG_NAME)
 
-        console.log(newChangelog)
-        console.log(changes)
+        // Update CHANGELOG
 
-        // const response = await octokit.rest.repos.createRelease({
-        //     owner: context.payload.repository?.owner?.login,
-        //     repo: context.payload.repository?.name,
-        //     branch: context.ref,
-        //     tag_name: TAG_NAME
-        // })
+        const updateChangelogResponse = await octokit.rest.repos.createOrUpdateFileContents({
+            owner,
+            repo,
+            path: CHANGELOG_PATH,
+            message: `prepare release ${version}`,
+            content: Buffer.from(newChangelog, 'utf8').toString('base64'),
+            sha: changeLog.data.sha,
+            branch: context.ref
+        })
 
-        // console.log('Release created successfully:', response.data.html_url)
+        console.log('CHANGELOG updated: ', updateChangelogResponse.data.html_url)
+
+        // Create release
+        const response = await octokit.rest.repos.createRelease({
+            owner,
+            repo,
+            tag_name: version,
+            target_commitish: context.ref,
+            name: `Version ${version.slice(1)}`,
+            body: changes,
+            draft: false,
+            prerelease: preRelease,
+            make_latest: makeLatest
+        })
+
+        console.log('Release created successfully:', response.data.html_url)
     } catch (error) {
         core.setFailed(error.message)
     }

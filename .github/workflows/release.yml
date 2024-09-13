@@ -9,6 +9,14 @@ on:
         description: 'Version string (semver)'
         required: true
         type: string
+      preRelease:
+        description: 'Is release a prerelease?'
+        type: boolean
+        default: false
+      makeLatest:
+        description: 'Make latest release?'
+        type: boolean
+        default: true
 
 jobs:
   checkout:
@@ -58,5 +66,7 @@ jobs:
         env:
           INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_VERSION: ${{ inputs.version }}
+          INPUT_PRERELEASE: ${{ inputs.preRelease }}
+          INPUT_MAKELATEST: ${{ inputs.makeLatest }}
         run:
           pnpm run create-release
