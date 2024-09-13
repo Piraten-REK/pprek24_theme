@@ -19,10 +19,10 @@ jobs:
         run: |
           if [[ "${{ inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Valid tag"
-            echo "name=tag_valid=true >> $GITHUB_OUTPUT"
+            echo "tag_valid=true >> $GITHUB_ENV"
           else
             echo "::error Invalid tag"
-            echo "name=tag_valid=false >> $GITHUB_OUTPUT"
+            echo "tag_valid=false >> $GITHUB_ENV"
           fi
 
       - name: Checkout
