@@ -49,5 +49,11 @@ jobs:
       - name: Install dependencies
         if: env.tag_valid == 'true'
         shell: bash
-        run: |
+        run:
           pnpm i && cd pprek24 && pnpm i
+
+      - name: Create Realease
+        if: env.tag_valid == 'true'
+        shell: bash
+        run:
+          pnpm run create-release

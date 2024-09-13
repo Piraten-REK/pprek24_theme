@@ -1,6 +1,7 @@
 {
 	"scripts": {
-		"build": "ncc build create-release.ts -o dist"
+		"build": "ncc build create-release.ts -o dist",
+		"create-release": "pnpm run build && node dist/index"
 	},
 	"devDependencies": {
 		"@actions/core": "^1.10.1",
