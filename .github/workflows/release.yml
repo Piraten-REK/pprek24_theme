@@ -39,7 +39,7 @@ jobs:
         if: steps.check_tag.outputs.tag_valid == 'true'
         shell: bash
         run:
-          wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
+          wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash - && source /home/runner/.bashrc
 
       - name: Install dependencies
         if: steps.check_tag.outputs.tag_valid == 'true'
