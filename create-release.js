@@ -79,6 +79,29 @@ function updateChangelog (currentChangelog, version) {
     return [newChangeLog.join('\n'), input]
 }
 
+/**
+ * @typedef {object} GetContent
+ * @property {number} status
+ * @property {string} url
+ * @property {Record<string, string>} headers
+ * @property {object} data
+ * @property {string} data.name
+ * @property {string} data.path
+ * @property {string} data.sha
+ * @property {number} data.size
+ * @property {string} data.url
+ * @property {string} data.html_url
+ * @property {string} data.git_url
+ * @property {string} data.download_url
+ * @property {'file'} data.type
+ * @property {string} data.content
+ * @property {BufferEncoding} data.encoding
+ * @property {object} data._links
+ * @property {string} data._links.self
+ * @property {string} data._links.git
+ * @property {string} data._links.html
+ */
+
 async function run () {
     try {
         const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
@@ -92,6 +115,7 @@ async function run () {
 
         const context = github.context ?? {}
 
+        /** @type {GetContent} */
         const changeLog = await octokit.rest.repos.getContent({
             owner: context.payload.repository?.owner?.login,
             repo: context.payload.repository?.name,
@@ -99,9 +123,14 @@ async function run () {
             path: CHANGELOG_PATH
         })
 
-        console.log(changeLog)
+        const changeLogString = Buffer.from(changeLog.data.content, changeLog.data.encoding).toString('utf8')
 
-        // const [newChangelog, changes] =  updateChangelog(changeLog.data, TAG_NAME)
+        console.log(changeLogString)
+
+        const [newChangelog, changes] =  updateChangelog(changeLogString, TAG_NAME)
+
+        console.log(newChangelog)
+        console.log(changes)
 
         // const response = await octokit.rest.repos.createRelease({
         //     owner: context.payload.repository?.owner?.login,
