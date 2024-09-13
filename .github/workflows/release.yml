@@ -39,10 +39,11 @@ jobs:
         if: env.tag_valid == 'true'
         shell: bash
         run:
-          wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash - && source /home/runner/.bashrc
+          wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
 
       - name: Install dependencies
         if: env.tag_valid == 'true'
         shell: bash
-        run:
+        run: |
+          source $HOME/.bashrc
           pnpm i && cd pprek24 && pnpm i
