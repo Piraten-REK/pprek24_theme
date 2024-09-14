@@ -215,8 +215,10 @@ async function run () {
             release_id: response.id,
             name: 'pprek24.zip',
             label: `PPREK24 ${version}`,
-            data: zipData
+            data: zipData.toString('base64')
         })
+
+        console.log('ZIP added successfully', zipResponse.data.html_url)
     } catch (error) {
         core.setFailed(error.message)
     }
