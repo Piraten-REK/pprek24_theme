@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+
+## [0.0.1] – 2024-09-14
+
+### 
+# Added
+- GitHub Actions Workflow to create new releases
+- Assets from [case study](https://github.com/piraten-rek/pprek24)
+
+
+## [Unreleased]
+
 # Added
 - GitHub Actions Workflow to create new releases
 - Assets from [case study](https://github.com/piraten-rek/pprek24)
