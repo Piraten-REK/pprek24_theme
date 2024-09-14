@@ -201,7 +201,7 @@ async function run () {
             body: changes,
             draft: false,
             prerelease: preRelease,
-            make_latest: makeLatest
+            make_latest: makeLatest.toString()
         })
 
         console.log('Release created successfully:', response.data.html_url)
