@@ -1,6 +1,12 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
-const os = require('os')
+const AdmZip = require('adm-zip')
+
+const BASE_INCLUDES = [
+    'CHANGELOG.md',
+    'LICENSE',
+    'README.md'
+]
 
 const CHANGELOG_PATH = 'CHANGELOG.md'
 
@@ -78,6 +84,37 @@ function updateChangelog (currentChangelog, version) {
     )
 
     return [newChangeLog.join('\n'), input.join('\n')]
+}
+
+/**
+ * @param {string} version
+ * @returns {Promise<Buffer>}
+ */
+async function createZip (version) {
+    const zip = new AdmZip()
+    zip.addZipComment(`PPREK24 Version ${version.slice(1)}`)
+
+    for (const file of BASE_INCLUDES) {
+        zip.addLocalFile(`./${file}`)
+    }
+
+    zip.addLocalFolder('pprek24', '.', filename => {
+        return (
+            !filename.endsWith('.gitignore') &&
+            !filename.startsWith('node_modules') &&
+            filename.startsWith('assets') && !(
+                filename.startsWith('assets/styles/sass') ||
+                filename.startsWith('assets/ts')
+            ) ||
+            filename === 'style.css' ||
+            filename === 'screenshot.png' ||
+            filename.endsWith('.php')
+        )
+    })
+
+    zip.deleteFile('./node_modules')
+
+    return zip.toBuffer()
 }
 
 /**
@@ -168,6 +205,18 @@ async function run () {
         })
 
         console.log('Release created successfully:', response.data.html_url)
+
+        const zipData = await createZip(version)
+
+        // Add ZIP
+        const zipResponse = await octokit.rest.repos.uploadReleaseAsset({
+            owner,
+            repo,
+            release_id: response.id,
+            name: 'pprek24.zip',
+            label: `PPREK24 ${version}`,
+            data: zipData
+        })
     } catch (error) {
         core.setFailed(error.message)
     }
