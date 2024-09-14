@@ -175,7 +175,7 @@ async function run () {
 
         const changeLogString = Buffer.from(changeLog.data.content, changeLog.data.encoding).toString('utf8')
 
-        const [newChangelog, changes] =  updateChangelog(changeLogString, TAG_NAME)
+        const [newChangelog, changes] =  updateChangelog(changeLogString, version)
 
         // Update CHANGELOG
 
