@@ -46,6 +46,23 @@ function pprek24_preload_styles (): void {
 
   $mapped = [];
   foreach ($pprek24_enqueued_styles as $url) {
-    printf('<link rel="preload" href="%s" as="style">', $url);
+    if (!str_ends_with(preg_replace('/\?[^\/]+$/', '', $url), '.css')) {
+      continue;
+    }
+
+    printf('<link rel="preload" href="%s" as="style">', get_theme_file_uri($url));
+  }
+}
+
+function pprek24_preload_scripts (): void {
+  global $pprek24_enqueued_styles;
+
+  $mapped = [];
+  foreach ($pprek24_enqueued_styles as $url) {
+    if (!str_ends_with(preg_replace('/\?[^\/]+$/', '', $url), '.js')) {
+      continue;
+    }
+
+    printf('<link rel="preload" href="%s" as="script">', get_theme_file_uri($url));
   }
 }

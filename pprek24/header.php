@@ -7,6 +7,7 @@
   <link rel="preload" href="<?php echo get_theme_file_uri('/assets/fonts/mulish_italic.woff2') ?>" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="<?php echo get_theme_file_uri('/assets/fonts/bootstrap-icons.woff2') ?>" as="font" type="font/woff2" crossorigin>
   <?php pprek24_preload_styles(); ?>
+  <?php pprek24_preload_scripts(); ?>
   <!-- FAVICON -->
   <meta name="referrer" content="same-origin">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="hsl(21 98% 40%)">
