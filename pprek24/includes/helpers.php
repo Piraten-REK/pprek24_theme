@@ -1,11 +1,5 @@
 <?php
 
-function pprek24_page_author (string $default = 'PIRATEN Rhein-Erft-Kreis'): string {
-  return is_singular()
-    ? get_the_author()
-    : $default;
-}
-
 function pprek24_get_description (): string {
   return get_bloginfo('description');
 }
