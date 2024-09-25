@@ -38,25 +38,16 @@ $pprek24_external_link_tag = '<i aria-hidden="true" class="bi bi-box-arrow-up-ri
 function pprek24_preload_styles (): void {
   global $pprek24_enqueued_styles;
 
-  $mapped = [];
   foreach ($pprek24_enqueued_styles as $url) {
-    if (!str_ends_with(preg_replace('/\?[^\/]+$/', '', $url), '.css')) {
-      continue;
-    }
-
     printf('<link rel="preload" href="%s" as="style">', get_theme_file_uri($url));
   }
 }
 
 function pprek24_preload_scripts (): void {
-  global $pprek24_enqueued_styles;
+  global $pprek24_enqueued_scripts;
 
   $mapped = [];
-  foreach ($pprek24_enqueued_styles as $url) {
-    if (!str_ends_with(preg_replace('/\?[^\/]+$/', '', $url), '.js')) {
-      continue;
-    }
-
+  foreach ($pprek24_enqueued_scripts as $url) {
     printf('<link rel="preload" href="%s" as="script">', get_theme_file_uri($url));
   }
 }

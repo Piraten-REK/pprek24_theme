@@ -1,0 +1,31 @@
+@use 'colors';
+
+@page  {
+  size: A4 portrait;
+  margin: 20mm;
+}
+
+:root {
+  font-size: 12pt;
+}
+
+html {
+  color-scheme: light;
+  @include colors.set-theme(light, true);
+}
+
+.site-header {
+  position: static;
+  background: none;
+  padding: 0;
+  box-shadow: none;
+
+  & > :not(.site-title) {
+    display: none;
+  }
+}
+
+.site-footer {
+  display: none;
+}
+

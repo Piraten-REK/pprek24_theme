@@ -1,0 +1,42 @@
+@page {
+  size: A4 portrait;
+  margin: 20mm;
+}
+:root {
+  font-size: 12pt;
+}
+
+html {
+  color-scheme: light;
+  --clr-accent-200: var(--clr-light-accent-200) !important;
+  --clr-accent-300: var(--clr-light-accent-300) !important;
+  --clr-accent-400: var(--clr-light-accent-400) !important;
+  --clr-accent-700: var(--clr-light-accent-700) !important;
+  --clr-accent-800: var(--clr-light-accent-800) !important;
+  --clr-txt-50: var(--clr-light-txt-50) !important;
+  --clr-txt-100: var(--clr-light-txt-100) !important;
+  --clr-txt-200: var(--clr-light-txt-200) !important;
+  --clr-txt-300: var(--clr-light-txt-300) !important;
+  --clr-txt-400: var(--clr-light-txt-400) !important;
+  --clr-input-bg: var(--clr-light-input-bg);
+  --clr-site-bg: var(--clr-light-site-bg);
+  --clr-nav-bg: var(--clr-light-nav-bg);
+  --clr-nav-txt: var(--clr-light-nav-txt);
+  --clr-header-bg: var(--clr-light-header-bg);
+}
+
+.site-header {
+  position: static;
+  background: none;
+  padding: 0;
+  box-shadow: none;
+}
+.site-header > :not(.site-title) {
+  display: none;
+}
+
+.site-footer {
+  display: none;
+}
+
+/*# sourceMappingURL=print.css.map */

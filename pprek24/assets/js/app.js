@@ -1,1 +1,445 @@
-function e(e){return function(e,t){return t*parseFloat(getComputedStyle(e).fontSize)}(document.documentElement,e)}var t;function i(e){const i=!("true"===e.getAttribute(t.ARIA_EXPANDED));return e.setAttribute(t.ARIA_EXPANDED,i.toString()),i}function n(e,i){e.setAttribute(t.ARIA_EXPANDED,i.toString())}!function(e){e.ARIA_CONTROLS="aria-controls",e.ARIA_EXPANDED="aria-expanded",e.ARIA_HASPOPUP="aria-haspopup"}(t||(t={}));var s=!("undefined"==typeof window||!window.document||!window.document.createElement);try{var r={get passive(){return!0},get once(){return!0}};s&&(window.addEventListener("test",r,r),window.removeEventListener("test",r,!0))}catch(e){}var c=(new Date).getTime();var o=function(e){var t=(new Date).getTime(),i=Math.max(0,16-(t-c)),n=setTimeout(e,i);return c=t,n},l=function(e,t){return e+(e?t[0].toUpperCase()+t.substr(1):t)+"AnimationFrame"};function h(e,t){var i;return((i=e)&&i.ownerDocument||document).addEventListener("click",t,!0),()=>removeEventListener("click",t)}s&&["","webkit","moz","o","ms"].some((function(e){var t=l(e,"request");return t in window&&(l(e,"cancel"),o=function(e){return window[t](e)}),!!o})),Function.prototype.bind.call(Function.prototype.call,[].slice),Function.prototype.bind.call(Function.prototype.call,[].slice);new class{headerPadding;header=document.querySelector("body > .site-header");siteTitle=document.querySelector("body > .site-header > .site-title");toggle=document.querySelector("body > .site-header > .site-nav-toggle");nav=document.querySelector("body > .site-header > .site-nav");list=document.querySelector("body > .site-header > .site-nav > ul");structure=this.getStructure();navWidth=this.nav.clientWidth;#e=!1;#t=[];constructor(t=e(4)){this.headerPadding=t,window.addEventListener("resize",this.navWatcher()),this.toggle.addEventListener("click",(()=>{this.toggleOpen()&&this.structure[0].element.focus()})),this.addClickListeners(),this.list.addEventListener("keydown",this.keyboardListener.bind(this))}get mobile(){return this.#e}set mobile(e){if(e!==this.#e){this.#e=e,document.body.setAttribute("data-mobile-nav",e.toString());for(const t of this.firstLevelElements())e?t.setAttribute("tabindex","-1"):t.removeAttribute("tabindex")}}get open(){return this.#t.length>0}set open(e){if(e!==this.open&&(this.#t=[0],n(this.toggle,e),!e)){let e=this.current;for(;null!=e;)n(e.toggle,!1),this.#t.pop(),e=this.current}}get closed(){return!this.open}set closed(e){if(e===this.open&&(n(this.toggle,!e),e)){let e=this.current;for(;null!=e;)n(e.toggle,!1),this.#t.pop(),e=this.current}}get indices(){return[...this.#t]}get current(){if(0===this.#t.length)return;let e=this.structure;const t=this.indices,i=t.pop();for(;t.length>0;)e=e[t.shift()].items;return e[i]}toggleOpen(){return this.open=this.closed,this.open}navWatcher(){const e=function(e){const t=e.clientWidth,i=getComputedStyle(e),n=[i.borderInlineStartWidth,i.borderInlineEndWidth].reduce(((e,t)=>e+parseFloat(t)),0),s=[i.paddingInlineStart,i.paddingInlineEnd].reduce(((e,t)=>e+parseFloat(t)),0);return t-n-s}(this.header),t=e-this.siteTitle.clientWidth-this.headerPadding;return this.mobile=this.navWidth>t,this.navWatcher.bind(this)}addClickListeners(e=this.structure,t=[]){for(let s=0,r=e[0];s<e.length;r=e[++s])"item"!==r.type&&(r.element.addEventListener("click",(()=>{if(i(r.element)){const e=this.current;this.#t.length>1&&null!=e&&n(e.toggle,!1),r.items[0].element.focus(),this.#t=[...t,s,0]}else r.element.focus(),this.#t=[...t,s]})),this.addClickListeners(r.items,[...t,s]));h(this.list,(e=>{if(this.closed)return;let t=e.target;for(;null!=t&&t.nodeType!==Node.DOCUMENT_NODE;){if(t===this.list||t===this.toggle)return;t=t.parentElement}this.closed=!0}))}keyboardListener(e){if(0===this.indices.length&&this.setIndicesByElement(e.target),"Tab"!==e.key||e.shiftKey){if("Tab"===e.key&&e.shiftKey)1===this.indices.length?this.mobile?(e.preventDefault(),this.decrementIndex(),this.current?.element?.focus()):0===this.indices[0]?this.closed=!0:this.decrementIndex(!1):(e.preventDefault(),this.decrementIndex(),this.current?.element?.focus());else if("Enter"===e.key||"Space"===e.code)"toggle"===this.current?.type&&(e.preventDefault(),n(this.current.element,!0),this.current.items[0].element.focus(),this.#t.push(0));else if("Escape"===e.key){if(!this.mobile&&1===this.#t.length)return;n(this.current?.toggle,!1),this.current?.toggle?.focus(),this.#t.pop()}else if("ArrowUp"===e.key){if(!this.mobile&&1===this.#t.length)return;e.preventDefault(),this.decrementIndex(),this.current?.element?.focus()}else if("ArrowDown"===e.key){if(!this.mobile&&1===this.#t.length)return void("toggle"===this.current?.type&&(e.preventDefault(),n(this.current.element,!0),this.current.items[0].element.focus(),this.#t.push(0)));e.preventDefault(),this.incrementIndex(),this.current?.element?.focus()}else if("ArrowRight"===e.key){if(e.preventDefault(),"toggle"!==this.current?.type)return;if(!this.mobile&&1===this.indices.length)return this.incrementIndex(),void this.current?.element?.focus();n(this.current.element,!0),this.current.items[0].element.focus(),this.#t.push(0)}else if("ArrowLeft"===e.key){if(e.preventDefault(),!this.mobile&&1===this.indices.length)return this.decrementIndex(),void this.current?.element?.focus();n(this.current?.toggle,!1),this.current?.toggle?.focus(),this.#t.pop()}}else 1===this.indices.length?this.mobile?(e.preventDefault(),this.incrementIndex(),this.current?.element?.focus()):this.indices[0]===this.structure.length-1?this.closed=!0:this.incrementIndex(!1):(e.preventDefault(),this.incrementIndex(),this.current?.element?.focus())}incrementIndex(e=!0){if(e){let e=this.structure;const t=this.indices.slice(0,-1);for(;t.length>0;)e=e[t.shift()].items;this.#t[this.#t.length-1]=(this.#t[this.#t.length-1]+e.length+1)%e.length}else this.#t[this.#t.length-1]++}decrementIndex(e=!0){if(e){let e=this.structure;const t=this.indices.slice(0,-1);for(;t.length>0;)e=e[t.shift()].items;this.#t[this.#t.length-1]=(this.#t[this.#t.length-1]+e.length-1)%e.length}else this.#t[this.#t.length-1]--}setIndicesByElement(e,t=this.structure,i=[]){for(let n=0,s=t[0];n<t.length;s=t[++n]){if(s.element===e)return this.#t=[...i,n],!0;if("toggle"===s.type&&this.setIndicesByElement(s.element,s.items,[...i,n]))return!0}return!1}*firstLevelElements(e=this.list){for(const t of Array.from(e.children))for(const e of Array.from(t.children))(e instanceof HTMLAnchorElement||e instanceof HTMLButtonElement)&&(yield e)}getStructure(e=this.list,i=this.toggle){const n=[];for(const s of this.firstLevelElements(e)){if(null!=s.getAttribute(t.ARIA_EXPANDED)){const r=s.getAttribute(t.ARIA_CONTROLS);if(null==r)throw new ReferenceError(`${t.ARIA_CONTROLS} unset`);const c=e.querySelector(`#${r}`);if(null==c)throw new ReferenceError(`${t.ARIA_CONTROLS} "${r}" invalid`);n.push({type:"toggle",element:s,list:c,toggle:i,items:this.getStructure(c,s)})}else n.push({type:"item",element:s,list:e,toggle:i})}return Object.freeze(n)}};
+function innerWidth(element) {
+    const outerWidth = element.clientWidth;
+    const styles = getComputedStyle(element);
+    const borderInline = [styles.borderInlineStartWidth, styles.borderInlineEndWidth]
+        .reduce((prev, cur) => prev + parseFloat(cur), 0);
+    const paddingInline = [styles.paddingInlineStart, styles.paddingInlineEnd]
+        .reduce((prev, cur) => prev + parseFloat(cur), 0);
+    return outerWidth - borderInline - paddingInline;
+}
+function em(element, value) {
+    const em1 = parseFloat(getComputedStyle(element).fontSize);
+    return value * em1;
+}
+function rem(value) {
+    return em(document.documentElement, value);
+}
+
+var AriaAttributes;
+(function (AriaAttributes) {
+    AriaAttributes["ARIA_CONTROLS"] = "aria-controls";
+    AriaAttributes["ARIA_EXPANDED"] = "aria-expanded";
+    AriaAttributes["ARIA_HASPOPUP"] = "aria-haspopup";
+})(AriaAttributes || (AriaAttributes = {}));
+function toggleExpanded(element) {
+    const current = element.getAttribute(AriaAttributes.ARIA_EXPANDED) === 'true';
+    const newValue = !current;
+    element.setAttribute(AriaAttributes.ARIA_EXPANDED, newValue.toString());
+    return newValue;
+}
+function setExpanded(element, value) {
+    element.setAttribute(AriaAttributes.ARIA_EXPANDED, value.toString());
+}
+
+/**
+ * Returns the owner document of a given element.
+ * 
+ * @param node the element
+ */
+function ownerDocument(node) {
+  return node && node.ownerDocument || document;
+}
+
+var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
+
+/* eslint-disable no-return-assign */
+var optionsSupported = false;
+var onceSupported = false;
+
+try {
+  var options = {
+    get passive() {
+      return optionsSupported = true;
+    },
+
+    get once() {
+      // eslint-disable-next-line no-multi-assign
+      return onceSupported = optionsSupported = true;
+    }
+
+  };
+
+  if (canUseDOM) {
+    window.addEventListener('test', options, options);
+    window.removeEventListener('test', options, true);
+  }
+} catch (e) {
+  /* */
+}
+
+/* https://github.com/component/raf */
+var prev = new Date().getTime();
+
+function fallback(fn) {
+  var curr = new Date().getTime();
+  var ms = Math.max(0, 16 - (curr - prev));
+  var handle = setTimeout(fn, ms);
+  prev = curr;
+  return handle;
+}
+
+var vendors = ['', 'webkit', 'moz', 'o', 'ms'];
+var rafImpl = fallback; // eslint-disable-next-line import/no-mutable-exports
+
+var getKey = function getKey(vendor, k) {
+  return vendor + (!vendor ? k : k[0].toUpperCase() + k.substr(1)) + "AnimationFrame";
+};
+
+if (canUseDOM) {
+  vendors.some(function (vendor) {
+    var rafMethod = getKey(vendor, 'request');
+
+    if (rafMethod in window) {
+      getKey(vendor, 'cancel'); // @ts-ignore
+
+      rafImpl = function rafImpl(cb) {
+        return window[rafMethod](cb);
+      };
+    }
+
+    return !!rafImpl;
+  });
+}
+
+Function.prototype.bind.call(Function.prototype.call, [].slice);
+
+Function.prototype.bind.call(Function.prototype.call, [].slice);
+
+function handleOutsideClick(element, eventHandler) {
+    const doc = ownerDocument(element);
+    doc.addEventListener('click', eventHandler, true);
+    return () => removeEventListener('click', eventHandler);
+}
+
+class SiteNav {
+    headerPadding;
+    header = document.querySelector('body > .site-header');
+    siteTitle = document.querySelector('body > .site-header > .site-title');
+    toggle = document.querySelector('body > .site-header > .site-nav-toggle');
+    nav = document.querySelector('body > .site-header > .site-nav');
+    list = document.querySelector('body > .site-header > .site-nav > ul');
+    structure = this.getStructure();
+    navWidth = this.nav.clientWidth;
+    #mobile = false;
+    #indices = [];
+    constructor(headerPadding = rem(4)) {
+        this.headerPadding = headerPadding;
+        window.addEventListener('resize', this.navWatcher());
+        this.toggle.addEventListener('click', () => {
+            const state = this.toggleOpen();
+            if (state) {
+                this.structure[0].element.focus();
+            }
+        });
+        this.addClickListeners();
+        this.list.addEventListener('keydown', this.keyboardListener.bind(this));
+    }
+    get mobile() {
+        return this.#mobile;
+    }
+    set mobile(value) {
+        if (value !== this.#mobile) {
+            this.#mobile = value;
+            document.body.setAttribute('data-mobile-nav', value.toString());
+            for (const elem of this.firstLevelElements()) {
+                if (value) {
+                    elem.setAttribute('tabindex', '-1');
+                }
+                else {
+                    elem.removeAttribute('tabindex');
+                }
+            }
+        }
+    }
+    get open() {
+        return this.#indices.length > 0;
+    }
+    set open(value) {
+        if (value !== this.open) {
+            this.#indices = [0];
+            setExpanded(this.toggle, value);
+            if (!value) {
+                let current = this.current;
+                while (current != null) {
+                    setExpanded(current.toggle, false);
+                    this.#indices.pop();
+                    current = this.current;
+                }
+            }
+        }
+    }
+    get closed() {
+        return !this.open;
+    }
+    set closed(value) {
+        if (value === this.open) {
+            setExpanded(this.toggle, !value);
+            if (value) {
+                let current = this.current;
+                while (current != null) {
+                    setExpanded(current.toggle, false);
+                    this.#indices.pop();
+                    current = this.current;
+                }
+            }
+        }
+    }
+    get indices() {
+        return [...this.#indices];
+    }
+    get current() {
+        if (this.#indices.length === 0) {
+            return undefined;
+        }
+        let structure = this.structure;
+        const idx = this.indices;
+        const lastIndex = idx.pop();
+        while (idx.length > 0) {
+            structure = structure[idx.shift()].items;
+        }
+        return structure[lastIndex];
+    }
+    toggleOpen() {
+        this.open = this.closed;
+        return this.open;
+    }
+    navWatcher() {
+        const headerWidth = innerWidth(this.header);
+        const titleWidth = this.siteTitle.clientWidth;
+        const delta = headerWidth - titleWidth - this.headerPadding;
+        this.mobile = this.navWidth > delta;
+        return this.navWatcher.bind(this);
+    }
+    addClickListeners(structure = this.structure, index = []) {
+        for (let idx = 0, item = structure[0]; idx < structure.length; item = structure[++idx]) {
+            if (item.type === 'item') {
+                continue;
+            }
+            item.element.addEventListener('click', () => {
+                const state = toggleExpanded(item.element);
+                if (state) {
+                    const current = this.current;
+                    if (this.#indices.length > 1 && current != null) {
+                        setExpanded(current.toggle, false);
+                    }
+                    item.items[0].element.focus();
+                    this.#indices = [...index, idx, 0];
+                }
+                else {
+                    item.element.focus();
+                    this.#indices = [...index, idx];
+                }
+            });
+            this.addClickListeners(item.items, [...index, idx]);
+        }
+        handleOutsideClick(this.list, event => {
+            if (this.closed) {
+                return;
+            }
+            let node = event.target;
+            while (node != null && node.nodeType !== Node.DOCUMENT_NODE) {
+                if (node === this.list || node === this.toggle) {
+                    return;
+                }
+                node = node.parentElement;
+            }
+            this.closed = true;
+        });
+    }
+    keyboardListener(event) {
+        if (this.indices.length === 0) {
+            this.setIndicesByElement(event.target);
+        }
+        if (event.key === 'Tab' && !event.shiftKey) {
+            if (this.indices.length === 1) {
+                if (this.mobile) {
+                    event.preventDefault();
+                    this.incrementIndex();
+                    this.current?.element?.focus();
+                }
+                else {
+                    if (this.indices[0] === this.structure.length - 1) {
+                        this.closed = true;
+                    }
+                    else {
+                        this.incrementIndex(false);
+                    }
+                }
+            }
+            else {
+                event.preventDefault();
+                this.incrementIndex();
+                this.current?.element?.focus();
+            }
+        }
+        else if (event.key === 'Tab' && event.shiftKey) {
+            if (this.indices.length === 1) {
+                if (this.mobile) {
+                    event.preventDefault();
+                    this.decrementIndex();
+                    this.current?.element?.focus();
+                }
+                else {
+                    if (this.indices[0] === 0) {
+                        this.closed = true;
+                    }
+                    else {
+                        this.decrementIndex(false);
+                    }
+                }
+            }
+            else {
+                event.preventDefault();
+                this.decrementIndex();
+                this.current?.element?.focus();
+            }
+        }
+        else if (event.key === 'Enter' || event.code === 'Space') {
+            if (this.current?.type === 'toggle') {
+                event.preventDefault();
+                setExpanded(this.current.element, true);
+                this.current.items[0].element.focus();
+                this.#indices.push(0);
+            }
+        }
+        else if (event.key === 'Escape') {
+            if (!this.mobile && this.#indices.length === 1) {
+                return;
+            }
+            setExpanded(this.current?.toggle, false);
+            this.current?.toggle?.focus();
+            this.#indices.pop();
+        }
+        else if (event.key === 'ArrowUp') {
+            if (!this.mobile && this.#indices.length === 1) {
+                return;
+            }
+            event.preventDefault();
+            this.decrementIndex();
+            this.current?.element?.focus();
+        }
+        else if (event.key === 'ArrowDown') {
+            if (!this.mobile && this.#indices.length === 1) {
+                if (this.current?.type === 'toggle') {
+                    event.preventDefault();
+                    setExpanded(this.current.element, true);
+                    this.current.items[0].element.focus();
+                    this.#indices.push(0);
+                }
+                return;
+            }
+            event.preventDefault();
+            this.incrementIndex();
+            this.current?.element?.focus();
+        }
+        else if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            if (this.current?.type !== 'toggle') {
+                return;
+            }
+            else if (!this.mobile && this.indices.length === 1) {
+                this.incrementIndex();
+                this.current?.element?.focus();
+                return;
+            }
+            setExpanded(this.current.element, true);
+            this.current.items[0].element.focus();
+            this.#indices.push(0);
+        }
+        else if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            if (!this.mobile && this.indices.length === 1) {
+                this.decrementIndex();
+                this.current?.element?.focus();
+                return;
+            }
+            setExpanded(this.current?.toggle, false);
+            this.current?.toggle?.focus();
+            this.#indices.pop();
+        }
+    }
+    incrementIndex(overflow = true) {
+        if (overflow) {
+            let structure = this.structure;
+            const idx = this.indices.slice(0, -1);
+            while (idx.length > 0) {
+                structure = structure[idx.shift()].items;
+            }
+            this.#indices[this.#indices.length - 1] = (this.#indices[this.#indices.length - 1] + structure.length + 1) % structure.length;
+        }
+        else {
+            this.#indices[this.#indices.length - 1]++;
+        }
+    }
+    decrementIndex(overflow = true) {
+        if (overflow) {
+            let structure = this.structure;
+            const idx = this.indices.slice(0, -1);
+            while (idx.length > 0) {
+                structure = structure[idx.shift()].items;
+            }
+            this.#indices[this.#indices.length - 1] = (this.#indices[this.#indices.length - 1] + structure.length - 1) % structure.length;
+        }
+        else {
+            this.#indices[this.#indices.length - 1]--;
+        }
+    }
+    setIndicesByElement(element, structure = this.structure, index = []) {
+        for (let idx = 0, item = structure[0]; idx < structure.length; item = structure[++idx]) {
+            if (item.element === element) {
+                this.#indices = [...index, idx];
+                return true;
+            }
+            if (item.type === 'toggle') {
+                if (this.setIndicesByElement(item.element, item.items, [...index, idx])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    *firstLevelElements(list = this.list) {
+        for (const child of Array.from(list.children)) {
+            for (const grandchild of Array.from(child.children)) {
+                if (grandchild instanceof HTMLAnchorElement || grandchild instanceof HTMLButtonElement) {
+                    yield grandchild;
+                }
+            }
+        }
+    }
+    getStructure(list = this.list, toggle = this.toggle) {
+        const structure = [];
+        for (const item of this.firstLevelElements(list)) {
+            const hasPopup = item.getAttribute(AriaAttributes.ARIA_EXPANDED) != null;
+            if (hasPopup) {
+                const controls = item.getAttribute(AriaAttributes.ARIA_CONTROLS);
+                if (controls == null) {
+                    throw new ReferenceError(`${AriaAttributes.ARIA_CONTROLS} unset`);
+                }
+                const subMenu = list.querySelector(`#${controls}`);
+                if (subMenu == null) {
+                    throw new ReferenceError(`${AriaAttributes.ARIA_CONTROLS} "${controls}" invalid`);
+                }
+                structure.push({
+                    type: 'toggle',
+                    element: item,
+                    list: subMenu,
+                    toggle,
+                    items: this.getStructure(subMenu, item)
+                });
+            }
+            else {
+                structure.push({
+                    type: 'item',
+                    element: item,
+                    list,
+                    toggle
+                });
+            }
+        }
+        return Object.freeze(structure);
+    }
+}
+
+new SiteNav();
+//# sourceMappingURL=app.js.map

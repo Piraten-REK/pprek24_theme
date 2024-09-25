@@ -46,20 +46,22 @@ $breakpoints: (
   color: var(--clr-txt-400);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    @include colors.set-theme(dark);
+@media not print {
+  @media (prefers-color-scheme: dark) {
+    :root {
+      @include colors.set-theme(dark);
+    }
   }
-}
 
-html[data-theme="light"] {
-  color-scheme: light;
-  @include colors.set-theme(light, true);
-}
+  html[data-theme="light"] {
+    color-scheme: light;
+    @include colors.set-theme(light, true);
+  }
 
-html[data-theme="dark"] {
-  color-scheme: dark;
-  @include colors.set-theme(dark, true);
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    @include colors.set-theme(dark, true);
+  }
 }
 
 *, *::before, *::after {
@@ -99,7 +101,7 @@ body {
       min-block-size: calc(100dvh - 32px);
     }
 
-		@media screen and ( max-width: 782px ) {
+    @media screen and ( max-width: 782px ) {
       min-block-size: calc(100vh - 46px);
       min-block-size: calc(100dvh - 46px);
     }
@@ -153,7 +155,7 @@ main {
   clip: rect(0, 0, 0, 0) !important;
   white-space: nowrap !important;
   border: 0 !important;
-  
+
   // Fix for positioned table caption that could become anonymous cells
   &:not(caption) {
     position: absolute !important;
@@ -201,7 +203,7 @@ main {
   border: 1px solid var(--clr-txt-200);
   padding-inline: .3em;
   border-radius: var(--input-border-radius);
-  
+
   &:focus-visible {
     outline: 2px solid var(--clr-accent-400);
     outline-offset: 2px;
