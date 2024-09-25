@@ -1,5 +1,10 @@
 <?php
 
+function pprek24_init (): void {
+  add_rewrite_rule('^site.webmanifest/?', 'index.php?webmanifest=1', 'top');
+  add_rewrite_rule('^browserconfig.xml/?', 'index.php?browserconfig=1', 'top');
+}
+
 function pprek24_setup_theme (): void {
   add_theme_support('post_thumbnails');
   add_theme_support('automatic-feed-links');

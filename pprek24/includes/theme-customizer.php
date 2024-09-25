@@ -1,5 +1,42 @@
 <?php
 
+function pprek24_get_default_webmanifest (): string {
+  return implode("\n", [
+    '{',
+    '    "name": "PIRATEN Rhein-Erft-Kreis",',
+    '    "short_name": "PIRATEN Rhein-Erft-Kreis",',
+    '    "icons": [',
+    '        {',
+    '          "src": "' . get_theme_file_uri('/assets/icons/android-chrome-192x192.png') . '",',
+    '            "sizes": "192x192",',
+    '            "type": "image/png"',
+    '        },',
+    '        {',
+    '          "src": "' . get_theme_file_uri('/assets/icons/android-chrome-512x512.png') . '",',
+    '            "sizes": "512x512",',
+    '            "type": "image/png"',
+    '        }',
+    '    ],',
+    '    "theme_color": "#ff8800",',
+    '    "background_color": "#ff8800"',
+    '}'
+  ]);
+}
+
+function pprek24_get_default_browserconfig_xml (): string {
+  return implode("\n", [
+    '<?xml version="1.0" encoding="utf-8"?>',
+    '<browserconfig>',
+    '  <msapplication>',
+    '    <tile>',
+    '      <square150x150logo src="' . get_theme_file_uri('/assets/icons/mstile-150x150.png') . '"/>',
+    '      <TileColor>#da532c</TileColor>',
+    '    </tile>',
+    '  </msapplication>',
+    '</browserconfig>'
+  ]);
+}
+
 function pprek24_customize_defaults(): array {
   return [
     'shortlink'                       =>  'https://piraten-rek.de',
@@ -8,12 +45,12 @@ function pprek24_customize_defaults(): array {
     'favicon_apple_touch_icon'        =>  get_theme_file_uri('assets/icons/apple-touch-icon.png'),
     'favicon_32'                      =>  get_theme_file_uri('/assets/icons/favicon-32x32.png'),
     'favicon_16'                      =>  get_theme_file_uri('/assets/icons/favicon-16x16.png'),
-    'webmanifest'                     =>  file_get_contents(get_theme_file_path('/assets/icons/site.webmanifest')),
+    'webmanifest'                     =>  pprek24_get_default_webmanifest(),
     'favicon_safari_pinned_tab'       =>  get_theme_file_uri('/assets/icons/safari-pinned-tab.svg'),
     'favicon_safari_pinned_tab_color' =>  '#ff8800',
     'favicon_ico'                     =>  get_theme_file_uri('/assets/icons/favicon.ico'),
     'favicon_msapplication_color'     =>  '#da532c',
-    'favicon_msapplication_config'    =>  file_get_contents(get_theme_file_path('/assets/icons/browserconfig.xml'))
+    'favicon_msapplication_config'    =>  pprek24_get_default_browserconfig_xml()
   ];
 }
 
@@ -133,8 +170,7 @@ function pprek24_customize_register(WP_Customize_Manager $wp_customize): void {
     ]
   ));
   $wp_customize->add_control(new WP_Customize_Code_Editor_Control(
-    $wp_customize, 'pprek24_webmanifest',
-    [
+    $wp_customize, 'pprek24_webmanifest', [
       'priority'    =>  133,
       'section'     => 'title_tagline',
       'label'       =>  __('Webmanifest', 'pprek24'),
@@ -279,9 +315,9 @@ function pprek24_favicon(string $type, bool $echo = false): mixed {
       break;
 
     case 'webmanifest':
-      $value = get_theme_mod('ppre24_favicon_webmanifest');
+      $value = get_theme_mod('pprek24_webmanifest');
       if (empty(trim($value))) {
-        $value = pprek24_customize_defaults()['favicon_webmanifest'];
+        $value = pprek24_customize_defaults()['webmanifest'];
       }
       break;
 
@@ -333,4 +369,8 @@ function pprek24_favicon(string $type, bool $echo = false): mixed {
   }
 
   return $value;
+}
+
+function pprek24_site_icon_meta_tags (array $meta_tags): array {
+  return [];
 }
