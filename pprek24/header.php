@@ -23,9 +23,21 @@
   <meta name="author" content="<?php echo esc_attr(pprek24_page_author()); ?>">
   <meta name="description" content="<?php echo esc_attr(pprek24_get_description()); ?>">
   <meta name="keywords" content="<?php echo esc_attr(implode(',', pprek24_global_tags())); ?>">
-  <meta name="creator" content="<?php echo pprek24_default_author() ?>">
-  <meta name="publisher" content="<?php echo pprek24_default_author() ?>">
-  <!-- OGP -->
+  <meta name="creator" content="<?php echo esc_attr(pprek24_default_author()); ?>">
+  <meta name="publisher" content="<?php echo esc_attr(pprek24_default_author()); ?>">
+  <meta property="og:title" content="<?php echo esc_attr(get_the_title()); ?>">
+  <meta property="og:type" content="<?php echo is_single() ? 'article' : (is_author() ? 'profile' : 'website'); ?>">
+  <?php $ogp_image = pprek24_ogp_default_social_img(); ?><meta property="og:image" content="<?php echo preg_replace('/^https:\/\//', 'http://', esc_url($ogp_image[0])); ?>">
+  <meta property="og:image:secure_url" content="<?php echo preg_replace('/^http:\/\//', 'https://', esc_url($ogp_image[0])); ?>">
+  <meta property="og:image:type" content="<?php echo esc_attr($ogp_image[3]); ?>">
+  <meta property="og:image:width" content="<?php echo esc_attr($ogp_image[1]); ?>">
+  <meta property="og:image:height" content="<?php echo esc_attr($ogp_image[2]); ?>">
+  <meta property="og:image:alt" content="<?php esc_attr(the_title()); ?>">
+  <meta property="og:url" content="<?php echo esc_url(wp_get_shortlink()); ?>">
+  <?php if (is_front_page()) { ?><meta property="og:description" content="<?php echo esc_attr(get_bloginfo('description')); ?>"><?php } ?> <!-- TODO -->
+  <meta property="og:locale" content="de-DE">
+  <meta property="og:site_name" content="<?php echo esc_attr(get_bloginfo('title')); ?>">
+
   <!-- TWITTER -->
   <link rel="home" href="/">
   <link rel="copyright" href="#_copyright">

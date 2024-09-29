@@ -50,7 +50,8 @@ function pprek24_customize_defaults(): array {
     'favicon_safari_pinned_tab_color' =>  '#ff8800',
     'favicon_ico'                     =>  get_theme_file_uri('/assets/icons/favicon.ico'),
     'favicon_msapplication_color'     =>  '#da532c',
-    'favicon_msapplication_config'    =>  pprek24_get_default_browserconfig_xml()
+    'favicon_msapplication_config'    =>  pprek24_get_default_browserconfig_xml(),
+    'ogp_default_social_img'          =>  get_theme_file_uri('/assets/img/social.webp'),
   ];
 }
 
@@ -96,6 +97,16 @@ function pprek24_customize_register(WP_Customize_Manager $wp_customize): void {
   ]);
   $wp_customize->add_setting('pprek24_favicon_msapplication_config', [
     'default' => pprek24_customize_defaults()['favicon_msapplication_config']
+  ]);
+  $wp_customize->add_setting('pprek24_ogp_default_social_img', [
+    'default' => pprek24_customize_defaults()['ogp_default_social_img']
+  ]);
+
+  // Sections
+  $wp_customize->add_section('pprek24_seo_meta', [
+    'title'       => __('SEO Meta-Tags', 'pprek24'),
+    'description' => __('OGP und Twitter Card Meta-Tags', 'pprek24'),
+    'priority'    => 160
   ]);
 
   // Controllers
@@ -213,6 +224,20 @@ function pprek24_customize_register(WP_Customize_Manager $wp_customize): void {
       'section'     => 'title_tagline',
       'label'       =>  __('Favicon (MSApplication Config)', 'pprek24'),
       'code_type'   => 'application/xml'
+    ]
+  ));
+  # FAVICON END
+  $wp_customize->add_control(new WP_Customize_Cropped_Image_Control(
+    $wp_customize, 'pprek24_ogp_default_social_img', [
+      'priority'    =>  100,
+      'section'     =>  'pprek24_seo_meta',
+      'label'       =>  __('Open Graph Standard Bild', 'pprek24'),
+      'description' =>  __('Wird verwendet, wenn kein Post-Thumbbnail existiert', 'pprek24'),
+      'width'       =>  1200,
+      'height'      =>  630,
+      'flex_width'  =>  true,
+      'flex_height' =>  true,
+      'mime_type'   =>  'image/'
     ]
   ));
 }
@@ -369,6 +394,25 @@ function pprek24_favicon(string $type, bool $echo = false): mixed {
   }
 
   return $value;
+}
+
+function pprek24_ogp_default_social_img (): array {
+  $value = get_theme_mod('pprek24_ogp_default_social_img');
+
+  if (is_string($value) && !empty(trim($value))) {
+    return [$value, 1200, 630, 'image/webp'];
+  } elseif (is_int($value)) {
+    $ret = wp_get_attachment_image_src($value, 'full');
+    $ret[3] = get_post_mime_type($value);
+    return $ret;
+  }
+
+  return [
+    pprek24_customize_defaults()['ogp_default_social_img'],
+    1200,
+    630,
+    'image/webp'
+  ];
 }
 
 function pprek24_site_icon_meta_tags (array $meta_tags): array {
