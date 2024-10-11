@@ -146,7 +146,7 @@ main {
 
 // See: https://www.a11yproject.com/posts/2013-01-11-how-to-hide-content/
 // See: https://kittygiraudel.com/2016/10/13/css-hide-and-seek/
-.visually-hidden {
+.sr-only {
   width: 1px !important;
   height: 1px !important;
   padding: 0 !important;
@@ -166,7 +166,7 @@ main {
 // (i.e. when focus is within the element/container that the class was applied to)
 
 // Useful for "Skip to main content" links; see https://www.w3.org/TR/2013/NOTE-WCAG20-TECHS-20130905/G1
-.visually-hidden-focusable {
+.sr-only-focusable {
   &:not(:focus):not(:focus-within) {
     width: 1px !important;
     height: 1px !important;
