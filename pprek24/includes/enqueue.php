@@ -6,7 +6,8 @@ function pprek24_enqueue (): callable {
 
   $styles = [
     'main'  =>  '/assets/styles/app.css',
-    'print' =>  ['/assets/styles/print.css', 'print'],
+    'print' =>  ['/assets/styles/print.css', 'media' => 'print'],
+    '404'   =>  ['/assets/styles/404.css', 'condition' => fn () => is_404()],
   ];
   $scripts = [
     'main_js' =>  '/assets/js/app.js'
@@ -23,9 +24,15 @@ function pprek24_enqueue (): callable {
 
   foreach ($styles as $handle => $src) {
     $url = is_array($src) ? $src[0] : $src;
-    $media = is_array($src) && sizeof($src) > 1 ? $src[1] : null;
+    $media = is_array($src) && array_key_exists('media', $src) ? $src['media'] : null;
+    /** @var bool $enqueue */
+    $enqueue = is_array($src) && array_key_exists('condition', $src)
+      ? is_callable($src['condition'])
+        ? $src['condition']()
+        : $src['condition']
+      : true;
 
-    if (!is_null($media) && $media !== 'all' && $media !== 'screen') {
+    if (!$enqueue || (!is_null($media) && $media !== 'all' && $media !== 'screen')) {
       continue;
     }
 
@@ -39,6 +46,16 @@ function pprek24_enqueue (): callable {
   foreach ($scripts as $handle => $src) {
     $url = $src;
 
+    $enqueue = is_array($src) && array_key_exists('condition', $src)
+      ? is_callable($src['condition'])
+        ? $src['condition']()
+        : $src['condition']
+      : true;
+
+    if (!$enqueue) {
+      continue;
+    }
+
     if (false !== $ver) {
       $url .= '?ver=' . $ver;
     }
@@ -49,12 +66,33 @@ function pprek24_enqueue (): callable {
   return function () use ($styles, $scripts, $uri, $ver): void {
     foreach ($styles as $handle => $src) {
       $url = is_array($src) ? $src[0] : $src;
-      $media = is_array($src) && sizeof($src) > 1 ? $src[1] : null;
+      $media = is_array($src) && array_key_exists('media', $src) ? $src['media'] : null;
+      /** @var bool $enqueue */
+      $enqueue = is_array($src) && array_key_exists('condition', $src)
+        ? is_callable($src['condition'])
+          ? $src['condition']()
+          : $src['condition']
+        : true;
+
+      if (!$enqueue) {
+        continue;
+      }
+
       wp_register_style("pprek24_$handle", $uri . $url, [], $ver, $media ?? 'all');
       wp_enqueue_style("pprek24_$handle");
     }
 
     foreach ($scripts as $handle => $src) {
+      $enqueue = is_array($src) && array_key_exists('condition', $src)
+        ? is_callable($src['condition'])
+          ? $src['condition']()
+          : $src['condition']
+        : true;
+
+      if (!$enqueue) {
+        continue;
+      }
+      
       wp_register_script("pprek24_$handle", $uri . $src, [], $ver, [ 'strategy' => 'defer' ]);
       wp_enqueue_script("pprek24_$handle");
     }
