@@ -77,11 +77,6 @@ $breakpoints: (
   box-sizing: border-box;
 }
 
-:where(*) {
-  margin: 0;
-  padding: 0;
-}
-
 html {
   inline-size: 100%;
   scroll-behavior: smooth;
@@ -211,7 +206,7 @@ main {
 }
 
 :where(.btn) {
-  background: var(--clr-accent-400);
+  background-color: var(--clr-accent-400);
   color: #fff;
   text-decoration: none;
   padding: .5em .6em;
@@ -229,6 +224,26 @@ main {
 
 .nobr {
   white-space: nowrap;
+}
+
+.link {
+  &, &:where(:link, &:visited) {
+    color: var(--clr-accent-400);
+  }
+
+  &:where(:hover, :focus-visible, :active) {
+    color: var(--clr-accent-300);
+  }
+
+  &:focus-visible {
+    outline: var(--clr-accent-300) solid .125em;
+    outline-offset: .125em;
+  }
+}
+
+:where(figure, img) {
+  display: block;
+  max-inline-size: 100%;
 }
 
 @import 'header';

@@ -8364,11 +8364,6 @@
   box-sizing: border-box;
 }
 
-:where(*) {
-  margin: 0;
-  padding: 0;
-}
-
 html {
   inline-size: 100%;
   scroll-behavior: smooth;
@@ -8430,7 +8425,7 @@ main {
   padding-inline: var(--layout-padding-start, var(--_padding-inline)) 0;
 }
 
-.visually-hidden {
+.sr-only {
   width: 1px !important;
   height: 1px !important;
   padding: 0 !important;
@@ -8440,11 +8435,11 @@ main {
   white-space: nowrap !important;
   border: 0 !important;
 }
-.visually-hidden:not(caption) {
+.sr-only:not(caption) {
   position: absolute !important;
 }
 
-.visually-hidden-focusable:not(:focus):not(:focus-within) {
+.sr-only-focusable:not(:focus):not(:focus-within) {
   width: 1px !important;
   height: 1px !important;
   padding: 0 !important;
@@ -8454,7 +8449,7 @@ main {
   white-space: nowrap !important;
   border: 0 !important;
 }
-.visually-hidden-focusable:not(caption) {
+.sr-only-focusable:not(caption) {
   position: absolute !important;
 }
 
@@ -8485,7 +8480,7 @@ main {
 }
 
 :where(.btn) {
-  background: var(--clr-accent-400);
+  background-color: var(--clr-accent-400);
   color: #fff;
   text-decoration: none;
   padding: 0.5em 0.6em;
@@ -8501,6 +8496,22 @@ main {
 
 .nobr {
   white-space: nowrap;
+}
+
+.link, .link:where(:link, .link:visited) {
+  color: var(--clr-accent-400);
+}
+.link:where(:hover, :focus-visible, :active) {
+  color: var(--clr-accent-300);
+}
+.link:focus-visible {
+  outline: var(--clr-accent-300) solid 0.125em;
+  outline-offset: 0.125em;
+}
+
+:where(figure, img) {
+  display: block;
+  max-inline-size: 100%;
 }
 
 .site-header {
