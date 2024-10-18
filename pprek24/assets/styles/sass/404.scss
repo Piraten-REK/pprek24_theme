@@ -1,0 +1,22 @@
+body.error404 main {
+  padding-block: min(var(--site-padding-inline) * 2.5, 4rem);
+  justify-items: center;
+  row-gap: 2rem;
+
+  figure figcaption {
+    text-align: end;
+  }
+
+  p {
+    font-size: 1.2rem;
+    text-align: center;
+
+    code {
+      display: inline-block;
+      background: var(--clr-txt-400);
+      color: var(--clr-site-bg);
+      padding: .2em .4em;
+      border-radius: .2em;
+    }
+  }
+}
