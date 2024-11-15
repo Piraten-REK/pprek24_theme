@@ -8237,7 +8237,7 @@
   src: local("Mulish"), url("../fonts/mulish_italic.woff2") format("woff2-variations");
 }
 :root {
-  --font-txt: "Mulish", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  --font-txt: "Mulish", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue";
   --clr-light-accent-200: hsl(21, 98%, 60%);
   --clr-light-accent-300: hsl(21, 98%, 50%);
   --clr-light-accent-400: hsl(21, 98%, 40%);
@@ -8288,7 +8288,7 @@
   --outer-padding-inline: max(calc(50% - var(--site-width) / 2), var(--site-padding-inline));
   --header-block-size: 5rem;
   color-scheme: light dark;
-  font-family: var(--font-txt);
+  font-family: var(--font-txt), sans-serif;
   font-size: 100%;
   line-height: 1.5;
   color: var(--clr-txt-400);
@@ -8954,6 +8954,98 @@ body[data-mobile-nav=true] .site-nav > ul > li ul > li:where([role=separator]) {
     justify-self: end;
     align-self: end;
   }
+}
+
+.card.post {
+  --_border-radius: 0.5rem;
+  background-color: var(--clr-header-bg);
+  filter: drop-shadow(0px 4px 16px hsla(0, 0%, 0%, 0.2));
+  border-radius: var(--_border-radius);
+  position: relative;
+  isolation: isolate;
+  transition: scale 0.3s ease, filter 0.3s ease;
+  width: 300px;
+}
+.card.post:where(:hover, :focus-within) {
+  scale: 1.05;
+  filter: drop-shadow(0px 4px 16px hsla(0, 0%, 0%, 0.4));
+}
+.card.post:focus-within:not(:has(footer:focus-within)) {
+  outline: 0.125rem solid var(--clr-accent-400);
+  outline-offset: 0.5rem;
+}
+.card.post .card-img {
+  inline-size: 100%;
+  aspect-ratio: 3/2;
+  display: block;
+  object-fit: cover;
+  object-position: var(--_object-fit, center center);
+  border-end-start-radius: var(--_border-radius);
+  border-end-end-radius: var(--_border-radius);
+}
+.card.post .card-img.default-img {
+  background-color: hsl(31, 100%, 50%);
+  background-image: radial-gradient(at 78% 29%, hsl(77, 71%, 43%) 0px, transparent 50%), radial-gradient(at 18% 25%, hsl(126, 68%, 37%) 0px, transparent 50%), radial-gradient(at 55% 54%, hsl(227, 31%, 49%) 0px, transparent 50%), radial-gradient(at 28% 74%, hsl(189, 58%, 55%) 0px, transparent 50%);
+}
+.card.post h2 {
+  margin: 1rem;
+  padding-block-start: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.card.post h2 a {
+  color: currentColor;
+  text-decoration: none;
+  outline: none;
+}
+.card.post h2 a::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.card.post .card-excerpt {
+  margin: 1rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.card.post footer {
+  margin: 1.5rem 1rem 0;
+  padding-block-end: 1rem;
+  font-size: 0.8rem;
+  color: var(--clr-txt-300);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+.card.post footer > div {
+  display: flex;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+.card.post footer ul {
+  display: contents;
+}
+.card.post footer ul li {
+  list-style-type: none;
+  display: inline-block;
+}
+.card.post footer a {
+  color: currentColor;
+  text-decoration: none;
+}
+.card.post footer a:hover {
+  color: var(--clr-txt-400);
+  text-decoration: underline var(--clr-accent-400);
+}
+.card.post footer a:focus-visible {
+  color: var(--clr-txt-400);
+  outline: 0.0625rem solid var(--clr-accent-400);
+  outline-offset: 0.5em;
 }
 
 /*# sourceMappingURL=app.css.map */

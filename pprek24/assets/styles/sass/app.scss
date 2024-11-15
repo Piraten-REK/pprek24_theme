@@ -21,7 +21,7 @@ $breakpoints: (
 }
 
 :root {
-  --font-txt: 'Mulish', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --font-txt: 'Mulish', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
 
   // LIGHT THEME COLORS
   @include colors.light-colors;
@@ -40,7 +40,7 @@ $breakpoints: (
   --header-block-size: 5rem;
   
   color-scheme: light dark;
-  font-family: var(--font-txt);
+  font-family: var(--font-txt), sans-serif;
   font-size: 100%;
   line-height: 1.5;
   color: var(--clr-txt-400);
@@ -248,3 +248,4 @@ main {
 
 @import 'header';
 @import 'footer';
+@import 'card';

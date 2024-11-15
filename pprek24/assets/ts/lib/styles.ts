@@ -17,7 +17,7 @@ export function innerWidth (element: AnyElement): number {
 
 /**
  * Calculates px value from em value
- * @param elem Element to base em on
+ * @param element Element to base em on
  * @param value Value in rem
  * @return Value in px
  */
