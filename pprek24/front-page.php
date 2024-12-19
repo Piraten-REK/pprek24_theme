@@ -9,7 +9,7 @@
 <section class="homepage_calendar">
   <h1><?php esc_html_e('Unsere Termine', 'pprek24'); ?></h1>
   <div class="homepage_calendar_wrapper">
-    <div class="spinner" data-pprek-calendar="next"></div>
+    <div class="spinner" data-pprek-calendar="next">PLACEHOLDER</div>
   </div>
 </section>
 <?php get_footer(); ?>
