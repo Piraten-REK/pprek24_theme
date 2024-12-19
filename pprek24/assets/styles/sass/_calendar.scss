@@ -1,0 +1,67 @@
+.pprek_calendar-event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  &_item {
+    --_block-size: 3.5rem;
+    background-color: var(--clr-header-bg);
+    filter: drop-shadow(0 .25rem 1rem hsl(0 0% 0% / 20%));
+    display: grid;
+    block-size: var(--_block-size);
+    grid-template:
+      "date title" 1.875rem
+      "date time" 1.625rem
+      / var(--_block-size) auto;
+    position: relative;
+    isolation: isolate;
+    border-radius: .25rem;
+    overflow: hidden;
+
+    &_date {
+      grid-area: date;
+      background-color: var(--clr-accent-400);
+      color: var(--clr-header-bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-transform: uppercase;
+      font-weight: 600;
+      line-height: 1;
+      gap: .25rem;
+
+      span:nth-child(1) {
+        font-size: 1.25rem;
+      }
+    }
+
+    &_title {
+      grid-area: title;
+      padding-inline: .75rem;
+      align-self: end;
+
+      a {
+        color: inherit;
+        text-decoration: none;
+
+        &::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: transparent;
+          z-index: 0;
+        }
+      }
+    }
+
+    &_time {
+      grid-area: time;
+      padding-inline: .75rem;
+      align-self: start;
+      font-size: .75rem;
+      line-height: 1.66667;
+      vertical-align: top;
+    }
+  }
+}

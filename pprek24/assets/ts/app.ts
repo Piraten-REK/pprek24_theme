@@ -1,5 +1,6 @@
 import SiteNav from './inc/SiteNav'
-import { config } from "./lib/utils";
+import { config } from "./lib/utils"
+import { CalendarEventList } from './inc/calendar'
 
 const siteNav = new SiteNav() // eslint-disable-line @typescript-eslint/no-unused-vars
 
@@ -22,10 +23,13 @@ if (config.calendar_api_url != null && config.calendar_api_url.trim().length >= 
     const calendarElements: NodeListOf<AnyElement> = document.querySelectorAll('[data-pprek-calendar]')
 
     calendarElements.forEach(element => {
-        if (element.dataset.pprekCalendar === 'next') {
-            fetch(`${config.calendar_api_url}/next`)
-                .then(r => r.json())
-                .then(r => console.log(r))
+        switch (element.dataset.pprekCalendar) {
+            case 'next':
+                new CalendarEventList(element)
+                break
+            case 'month':
+                new CalendarMonth(element)
+                break
         }
     })
 }
