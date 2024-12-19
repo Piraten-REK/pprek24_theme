@@ -109,3 +109,15 @@ function pprek24_get_day_archive (WP_Post|int|null $post = null): string {
 define('PPREK24_JAVASCRIPT_CONFIGURATION', [
   'calendar_api_url' => pprek24_calendar_api_url()
 ]);
+
+function pprek24_modify_page_title (array $title_parts): array {
+  if (str_ends_with(get_page_template(), 'page-calendar.php')) {
+    if (!empty($_GET['title'])) {
+      $title_parts['title'] = $_GET['title'];
+    } else {
+      $title_parts['title'] = 'Unsere Termine';
+    }
+  }
+
+  return $title_parts;
+}
