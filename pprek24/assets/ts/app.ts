@@ -1,8 +1,8 @@
 import SiteNav from './inc/SiteNav'
 import { config } from "./lib/utils"
-import { CalendarEventList } from './inc/calendar'
+import { CalendarEventList, CalendarMonth } from './inc/calendar'
 
-const siteNav = new SiteNav() // eslint-disable-line @typescript-eslint/no-unused-vars
+new SiteNav()
 
 const defaultImgs = document.querySelectorAll('.card .card-img.default-img') as NodeListOf<HTMLDivElement>
 
@@ -17,7 +17,6 @@ defaultImgs.forEach(element => {
 })
 
 // ----
-
 
 if (config.calendar_api_url != null && config.calendar_api_url.trim().length >= 0) {
     const calendarElements: NodeListOf<AnyElement> = document.querySelectorAll('[data-pprek-calendar]')
