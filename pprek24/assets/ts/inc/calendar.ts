@@ -82,7 +82,7 @@ export class CalendarEventList <Elem extends AnyElement> extends CalendarBase<El
     article.classList.add('pprek_calendar-event-list_item')
     article.setAttribute('aria-labelledby', `${this.id}_${idx}_title`)
     article.setAttribute('aria-describedby', `${this.id}_${idx}_date ${this.id}_${idx}_time`)
-    article.setAttribute('aria-posinset', idx.toString())
+    article.setAttribute('aria-posinset', (idx + 1).toString())
     article.setAttribute('aria-setsize', length.toString())
 
     const title = document.createElement('div')
