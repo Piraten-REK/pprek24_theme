@@ -441,6 +441,14 @@ class SiteNav {
     }
 }
 
+function useIfExists(it, callback, defaultValue = null) {
+    if (it == null) {
+        return defaultValue;
+    }
+    return callback(it);
+}
+const config = useIfExists(document.querySelector('#pprek_js_conf'), it => JSON.parse(it.textContent ?? '{}'), {});
+
 new SiteNav();
 const defaultImgs = document.querySelectorAll('.card .card-img.default-img');
 defaultImgs.forEach(element => {
@@ -452,4 +460,14 @@ defaultImgs.forEach(element => {
         `radial-gradient(at 28% 74%, hsl(${(189 + factor) % 360} 58% 55%) 0px, transparent 50%)`
     ].join();
 });
+if (config.calendar_api_url != null && config.calendar_api_url.trim().length >= 0) {
+    const calendarElements = document.querySelectorAll('[data-pprek-calendar]');
+    calendarElements.forEach(element => {
+        if (element.dataset.pprekCalendar === 'next') {
+            fetch(`${config.calendar_api_url}/next`)
+                .then(r => r.json())
+                .then(r => console.log(r));
+        }
+    });
+}
 //# sourceMappingURL=app.js.map

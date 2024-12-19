@@ -1,4 +1,5 @@
 import SiteNav from './inc/SiteNav'
+import { config } from "./lib/utils";
 
 const siteNav = new SiteNav() // eslint-disable-line @typescript-eslint/no-unused-vars
 
@@ -13,3 +14,18 @@ defaultImgs.forEach(element => {
         `radial-gradient(at 28% 74%, hsl(${(189 + factor) %  360} 58% 55%) 0px, transparent 50%)`
     ].join()
 })
+
+// ----
+
+
+if (config.calendar_api_url != null && config.calendar_api_url.trim().length >= 0) {
+    const calendarElements: NodeListOf<AnyElement> = document.querySelectorAll('[data-pprek-calendar]')
+
+    calendarElements.forEach(element => {
+        if (element.dataset.pprekCalendar === 'next') {
+            fetch(`${config.calendar_api_url}/next`)
+                .then(r => r.json())
+                .then(r => console.log(r))
+        }
+    })
+}

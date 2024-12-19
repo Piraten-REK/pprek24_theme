@@ -105,3 +105,7 @@ function pprek24_get_day_archive (WP_Post|int|null $post = null): string {
 
   return get_day_link($year, $month, $day);
 }
+
+define('PPREK24_JAVASCRIPT_CONFIGURATION', [
+  'calendar_api_url' => pprek24_calendar_api_url()
+]);

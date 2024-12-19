@@ -46,6 +46,7 @@
   <link rel="code-license" href="https://github.com/piraten-rek/pprek24_theme/LICENSE">
   <link rel="content-license" href="#_license">
   <link rel="privacy-policy" href="/datenschutz">
+  <script type="application/json" id="pprek_js_conf"><?php echo json_encode(PPREK24_JAVASCRIPT_CONFIGURATION) ?></script>
   <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>

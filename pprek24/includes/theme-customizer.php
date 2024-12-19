@@ -52,6 +52,7 @@ function pprek24_customize_defaults(): array {
     'favicon_msapplication_color'     =>  '#da532c',
     'favicon_msapplication_config'    =>  pprek24_get_default_browserconfig_xml(),
     'ogp_default_social_img'          =>  get_theme_file_uri('/assets/img/social.webp'),
+    'calendar_api_url'                => 'https://calendar.piraten-rek.de',
   ];
 }
 
@@ -100,6 +101,9 @@ function pprek24_customize_register(WP_Customize_Manager $wp_customize): void {
   ]);
   $wp_customize->add_setting('pprek24_ogp_default_social_img', [
     'default' => pprek24_customize_defaults()['ogp_default_social_img']
+  ]);
+  $wp_customize->add_setting('pprek24_calendar_api_url', [
+    'default' => pprek24_customize_defaults()['calendar_api_url']
   ]);
 
   // Sections
@@ -238,6 +242,15 @@ function pprek24_customize_register(WP_Customize_Manager $wp_customize): void {
       'flex_width'  =>  true,
       'flex_height' =>  true,
       'mime_type'   =>  'image/'
+    ]
+  ));
+  $wp_customize->add_control(new WP_Customize_Control(
+    $wp_customize, 'pprek24_calendar_api_url', [
+      'priority'    =>  120,
+      'section'     =>  'static_front_page',
+      'label'       =>  __('Kalender API-URL', 'pprek24'),
+      'type'        =>  'url',
+      'description' =>  __('URL unter der die Kalender API zu finden ist.', 'pprek24')
     ]
   ));
 }
@@ -417,4 +430,13 @@ function pprek24_ogp_default_social_img (): array {
 
 function pprek24_site_icon_meta_tags (array $meta_tags): array {
   return [];
+}
+
+function pprek24_calendar_api_url(): string {
+  $value = get_theme_mod('pprek24_calendar_api_url');
+  if (is_null($value) || empty(trim($value))) {
+    return pprek24_customize_defaults()['calendar_api_url'];
+  }
+
+  return $value;
 }

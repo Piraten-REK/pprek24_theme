@@ -6,4 +6,10 @@
     <?php while ($posts->have_posts()) : $posts->the_post(); get_template_part('partials/card', 'post'); endwhile; ?>
   </div>
 </section>
+<section class="homepage_calendar">
+  <h1><?php esc_html_e('Unsere Termine', 'pprek24'); ?></h1>
+  <div class="homepage_calendar_wrapper">
+    <div class="spinner" data-pprek-calendar="next"></div>
+  </div>
+</section>
 <?php get_footer(); ?>
