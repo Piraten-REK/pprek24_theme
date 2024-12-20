@@ -212,10 +212,14 @@ async function run () {
         const zipResponse = await octokit.rest.repos.uploadReleaseAsset({
             owner,
             repo,
-            release_id: response.id,
+            release_id: response.data.id,
             name: 'pprek24.zip',
             label: `PPREK24 ${version}`,
-            data: zipData.toString('base64')
+            headers: {
+                'content-type': 'application/zip',
+                'content-length': zipData.length
+            },
+            data: zipData
         })
 
         console.log('ZIP added successfully', zipResponse.data.html_url)
