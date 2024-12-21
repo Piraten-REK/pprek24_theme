@@ -102,9 +102,11 @@ async function createZip (version) {
         return (
             !filename.endsWith('.gitignore') &&
             !filename.startsWith('node_modules') &&
-            filename.startsWith('assets') && !(
-                filename.startsWith('assets/styles/sass') ||
-                filename.startsWith('assets/ts')
+            filename.startsWith('assets/') && !(
+                filename.startsWith('assets/styles/sass/') ||
+                filename.startsWith('assets/ts/') ||
+                filename.startsWith('assets/svelte/') ||
+                filename.startsWith('assets/js/svelte.css')
             ) ||
             filename === 'style.css' ||
             filename === 'screenshot.png' ||
