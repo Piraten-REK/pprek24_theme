@@ -1,9 +1,9 @@
 import SiteNav from './inc/SiteNav'
 import { config } from "./lib/utils"
-// import { CalendarEventList, CalendarMonth } from './inc/calendar'
 
 import { mount } from 'svelte'
 import CalendarNextEvents from '../svelte/CalendarNextEvents.svelte'
+import CalendarMonth from '../svelte/CalendarMonth.svelte'
 
 new SiteNav()
 
@@ -28,6 +28,15 @@ if (config.calendar_api_url != null && config.calendar_api_url.trim().length >= 
         switch (element.dataset.pprekCalendar) {
             case 'next':
                 mount(CalendarNextEvents, { target: element })
+                break
+            case 'month':
+                mount(CalendarMonth, {
+                    target: element,
+                    props: {
+                        year: element.dataset.pprekYear,
+                        month: element.dataset.pprekMonth
+                    }
+                })
                 break
         }
     })

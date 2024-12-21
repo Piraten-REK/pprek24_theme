@@ -1,3 +1,5 @@
+import type Calendar from '../calendar-types'
+
 export function use <T, R> (it: T, callback: (it: T) => R): R {
   return callback(it)
 }
@@ -52,4 +54,35 @@ export function getRandomId (length: number = 6, prefix: string = '', postfix: s
   return (document.getElementById(str) != null)
       ? getRandomId(length, prefix, postfix, ++attempt)
       : str
+}
+
+export function eventAffectsDate (event: Calendar.Event, date: Date): boolean {
+  const start = new Date(event.start)
+  const end = new Date(event.end)
+  const startInt = start.getFullYear() * 10000 + (start.getMonth() + 1) * 100 + start.getDate()
+  const endInt = end.getFullYear() * 10000 + (end.getMonth() + 1) * 100 + end.getDate()
+  const int = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate()
+
+  return startInt <= int && endInt >= int
+}
+
+export function leftPad (num: number, length: number = 2, pad: string = '0'): string {
+  if (pad.length !== 1) {
+    throw new SyntaxError('pad must be a single character')
+  }
+
+  // @ts-expect-error
+  length = Number.parseInt(length)
+
+  if (length <= 1) {
+    length = 2
+  }
+
+  let res = num.toString()
+
+  while (res.length < length) {
+    res = '0' + res
+  }
+
+  return res
 }

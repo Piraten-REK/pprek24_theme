@@ -14,7 +14,7 @@ get_header();
 
 if ($type == 'month'): ?>
 <h1>Unsere Termine</h1>
-<div class="spinner" data-pprek-calendar="month" data-pprek-year="<?php echo esc_attr($_GET['year']); ?>" data-pprek-month="<?php echo esc_attr($_GET['month']); ?>">PLACEHOLDER</div>
+<div data-pprek-calendar="month" data-pprek-year="<?php echo esc_attr($_GET['year']); ?>" data-pprek-month="<?php echo esc_attr($_GET['month']); ?>">PLACEHOLDER</div>
 <?php else: ?>
 KALENDER
 <?php endif; get_footer(); ?>

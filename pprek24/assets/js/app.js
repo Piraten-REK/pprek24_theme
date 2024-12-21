@@ -472,6 +472,28 @@ function getRandomId(length = 6, prefix = '', postfix = '', attempt = 0) {
         ? getRandomId(length, prefix, postfix, ++attempt)
         : str;
 }
+function eventAffectsDate(event, date) {
+    const start = new Date(event.start);
+    const end = new Date(event.end);
+    const startInt = start.getFullYear() * 10000 + (start.getMonth() + 1) * 100 + start.getDate();
+    const endInt = end.getFullYear() * 10000 + (end.getMonth() + 1) * 100 + end.getDate();
+    const int = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+    return startInt <= int && endInt >= int;
+}
+function leftPad(num, length = 2, pad = '0') {
+    if (pad.length !== 1) {
+        throw new SyntaxError('pad must be a single character');
+    }
+    length = Number.parseInt(length);
+    if (length <= 1) {
+        length = 2;
+    }
+    let res = num.toString();
+    while (res.length < length) {
+        res = '0' + res;
+    }
+    return res;
+}
 
 const node_env = globalThis.process?.env?.NODE_ENV;
 if (!node_env) {
@@ -490,6 +512,8 @@ var get_descriptors = Object.getOwnPropertyDescriptors;
 var object_prototype = Object.prototype;
 var array_prototype = Array.prototype;
 var get_prototype_of = Object.getPrototypeOf;
+
+const noop = () => {};
 
 // Adapted from https://github.com/then/is-promise/blob/master/index.js
 // Distributed under MIT License https://github.com/then/is-promise/blob/master/LICENSE
@@ -4537,6 +4561,29 @@ function link(state, prev, next) {
 	}
 }
 
+/** @import { Snippet } from 'svelte' */
+/** @import { Effect, TemplateNode } from '#client' */
+/** @import { Getters } from '#shared' */
+
+/**
+ * In development, wrap the snippet function so that it passes validation, and so that the
+ * correct component context is set for ownership checks
+ * @param {any} component
+ * @param {(node: TemplateNode, ...args: any[]) => void} fn
+ */
+function wrap_snippet(component, fn) {
+	return (/** @type {TemplateNode} */ node, /** @type {any[]} */ ...args) => {
+		var previous_component_function = dev_current_component_function;
+		set_dev_current_component_function(component);
+
+		try {
+			return fn(node, ...args);
+		} finally {
+			set_dev_current_component_function(previous_component_function);
+		}
+	};
+}
+
 /**
  * @param {Element} element
  * @param {string} attribute
@@ -4737,13 +4784,13 @@ enable_legacy_mode_flag();
 mark_module_start();
 Loader[FILENAME] = "assets/svelte/Loader.svelte";
 
-var root = add_locations(template(`<div class="pprek24-loader svelte-fjbi06"></div>`), Loader[FILENAME], [[1, 0]]);
+var root$1 = add_locations(template(`<div class="pprek24-loader svelte-fjbi06"></div>`), Loader[FILENAME], [[1, 0]]);
 
 function Loader($$anchor, $$props) {
 	check_target(new.target);
 	push($$props, false, Loader);
 
-	var div = root();
+	var div = root$1();
 
 	append($$anchor, div);
 	return pop({ ...legacy_api() });
@@ -4757,7 +4804,7 @@ CalendarNextEvents[FILENAME] = "assets/svelte/CalendarNextEvents.svelte";
 var root_5 = add_locations(template(`ganztägig bis <time> </time>`, 1), CalendarNextEvents[FILENAME], [[56, 27]]);
 var root_6 = add_locations(template(`<time> </time> bis <time><!> </time>`, 1), CalendarNextEvents[FILENAME], [[58, 12], [59, 12]]);
 
-var root_2 = add_locations(template(`<article class="event svelte-15qbi6x"><div class="event-title svelte-15qbi6x"><a class="svelte-15qbi6x"> </a></div> <time class="event-date svelte-15qbi6x"><span class="svelte-15qbi6x"> </span> <span class="svelte-15qbi6x"> </span></time> <span class="event-time svelte-15qbi6x"><!></span></article>`), CalendarNextEvents[FILENAME], [
+var root_2$1 = add_locations(template(`<article class="event svelte-15qbi6x"><div class="event-title svelte-15qbi6x"><a class="svelte-15qbi6x"> </a></div> <time class="event-date svelte-15qbi6x"><span class="svelte-15qbi6x"> </span> <span class="svelte-15qbi6x"> </span></time> <span class="event-time svelte-15qbi6x"><!></span></article>`), CalendarNextEvents[FILENAME], [
 	[
 		32,
 		6,
@@ -4769,7 +4816,7 @@ var root_2 = add_locations(template(`<article class="event svelte-15qbi6x"><div 
 	]
 ]);
 
-var root_1 = add_locations(template(`<div class="event-list svelte-15qbi6x"></div>`), CalendarNextEvents[FILENAME], [[27, 2]]);
+var root_1$1 = add_locations(template(`<div class="event-list svelte-15qbi6x"></div>`), CalendarNextEvents[FILENAME], [[27, 2]]);
 var root_8 = add_locations(template(`<div>Error</div> <pre> </pre>`, 1), CalendarNextEvents[FILENAME], [[71, 2], [72, 2]]);
 
 function CalendarNextEvents($$anchor, $$props) {
@@ -4797,10 +4844,10 @@ function CalendarNextEvents($$anchor, $$props) {
 			Loader($$anchor, {});
 		},
 		($$anchor, events) => {
-			var div = root_1();
+			var div = root_1$1();
 
 			each(div, 21, () => get(events), index, ($$anchor, event, index) => {
-				var article = root_2();
+				var article = root_2$1();
 
 				const query = derived(() => new URLSearchParams({
 					start: get(event).start,
@@ -4963,6 +5010,148 @@ function CalendarNextEvents($$anchor, $$props) {
 
 mark_module_end(CalendarNextEvents);
 
+mark_module_start();
+CalendarMonth[FILENAME] = "assets/svelte/CalendarMonth.svelte";
+
+var root_1 = add_locations(template(`<th> </th>`), CalendarMonth[FILENAME], [[72, 8]]);
+var root_3 = add_locations(template(`<td> </td>`), CalendarMonth[FILENAME], [[89, 10]]);
+var root_2 = add_locations(template(`<tr></tr>`), CalendarMonth[FILENAME], [[87, 6]]);
+
+var root = add_locations(template(`<table><caption> </caption><thead><tr><!><!><!><!><!><!><!></tr></thead><tbody></tbody></table>`), CalendarMonth[FILENAME], [
+	[
+		66,
+		0,
+		[
+			[67, 2],
+			[68, 2, [[69, 4]]],
+			[85, 2]
+		]
+	]
+]);
+
+function CalendarMonth($$anchor, $$props) {
+	check_target(new.target);
+	push($$props, true, CalendarMonth);
+	validate_prop_bindings($$props, [], [], CalendarMonth);
+
+	const now = new Date();
+
+	const year = prop($$props, "year", 19, () => now.getFullYear()),
+		month = prop($$props, "month", 19, () => now.getMonth() + 1);
+
+	const firstOfMonth = new Date(year(), month() - 1, 1, 0, 0, 0, 0);
+	const firstVisible = new Date(firstOfMonth);
+
+	firstVisible.setDate(-1 * ((firstVisible.getDay() + 6) % 7) + 1);
+
+	const events = proxy([]);
+
+	const days = derived(() => {
+		// @ts-expect-error
+		const res = new Array(6).fill(null).map(() => new Array(7).fill(null));
+		const date = new Date(firstVisible);
+
+		for (let w = 0; w < 6; w++) {
+			for (let d = 0; d < 7; d++) {
+				const events_ = events.filter((event) => eventAffectsDate(event, date));
+
+				res[w][d] = {
+					dateString: `${date.getFullYear()}-${leftPad(date.getMonth() + 1)}-${leftPad(date.getDate())}`,
+					day: date.getDate(),
+					label: dateFormatters.longDateFormatter.format(date),
+					events: events_,
+					eventFul: events_.length > 0,
+					type: events_.length > 0 ? 'eventful' : 'eventless',
+					position: strict_equals(date.getMonth() + 1, date.getMonth()) ? 'in-month' : 'out-of-month'
+				};
+
+				date.setHours(24);
+			}
+		}
+
+		return res;
+	});
+
+	var table = root();
+	var caption = child(table);
+	var text = child(caption);
+
+	template_effect(() => set_text(text, `Unsere Termine im ${dateFormatters.longMonthFormatter.format(firstOfMonth) ?? ""}`));
+
+	var thead = sibling(caption);
+	var tr = child(thead);
+
+	{
+		const th = wrap_snippet(CalendarMonth, ($$anchor, day = noop) => {
+			var th_1 = root_1();
+			const date = derived(() => new Date(2024, 11, 1 + day(), 0, 0, 0, 0));
+
+			get(date);
+			template_effect(() => set_attribute(th_1, "title", dateFormatters.longWeekDayFormatter.format(get(date))));
+
+			var text_1 = child(th_1, true);
+
+			template_effect(() => set_text(text_1, dateFormatters.shortWeekDayFormatter.format(get(date))));
+			reset(th_1);
+			append($$anchor, th_1);
+		});
+
+		var node = child(tr);
+
+		th(node, () => 1);
+
+		var node_1 = sibling(node);
+
+		th(node_1, () => 2);
+
+		var node_2 = sibling(node_1);
+
+		th(node_2, () => 3);
+
+		var node_3 = sibling(node_2);
+
+		th(node_3, () => 4);
+
+		var node_4 = sibling(node_3);
+
+		th(node_4, () => 5);
+
+		var node_5 = sibling(node_4);
+
+		th(node_5, () => 6);
+
+		var node_6 = sibling(node_5);
+
+		th(node_6, () => 7);
+	}
+
+	var tbody = sibling(thead);
+
+	each(tbody, 21, () => get(days), index, ($$anchor, week) => {
+		var tr_1 = root_2();
+
+		each(tr_1, 21, () => get(week), index, ($$anchor, day) => {
+			var td = root_3();
+			var text_2 = child(td);
+
+			template_effect(() => {
+				set_attribute(td, "aria-label", get(day).label);
+				set_attribute(td, "data-day", get(day).dateString);
+				set_attribute(td, "data-position", get(day).position);
+				set_attribute(td, "data-type", get(day).type);
+				set_text(text_2, get(day).day);
+			});
+
+			append($$anchor, td);
+		});
+		append($$anchor, tr_1);
+	});
+	append($$anchor, table);
+	return pop({ ...legacy_api() });
+}
+
+mark_module_end(CalendarMonth);
+
 new SiteNav();
 const defaultImgs = document.querySelectorAll('.card .card-img.default-img');
 defaultImgs.forEach(element => {
@@ -4980,6 +5169,15 @@ if (config.calendar_api_url != null && config.calendar_api_url.trim().length >= 
         switch (element.dataset.pprekCalendar) {
             case 'next':
                 mount(CalendarNextEvents, { target: element });
+                break;
+            case 'month':
+                mount(CalendarMonth, {
+                    target: element,
+                    props: {
+                        year: element.dataset.pprekYear,
+                        month: element.dataset.pprekMonth
+                    }
+                });
                 break;
         }
     });
