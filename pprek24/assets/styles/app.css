@@ -9048,15 +9048,52 @@ body[data-mobile-nav=true] .site-nav > ul > li ul > li:where([role=separator]) {
   outline-offset: 0.5em;
 }
 
-.pprek_calendar-event-list {
+.pprek24-loader {
+  --_clr: var(--clr-txt-100);
+  --_clr-accent: var(--clr-accent-300);
+  block-size: 1em;
+  inline-size: 4em;
+  position: relative;
+  isolation: isolate;
+  margin: 2rem auto;
+  &::before {
+    content: "";
+    inline-size: 1em;
+    aspect-ratio: 1;
+    display: block;
+    position: absolute;
+    inset: 0 auto auto 1.5em;
+    background-color: var(--_clr);
+    border-radius: 50%;
+    filter: drop-shadow(-1.5em 0 0 var(--_clr-accent)) drop-shadow(1.5em 0 0 var(--_clr));
+    animation: svelte-fjbi06-shadowPulse 3s linear infinite;
+  }
+}
+
+@keyframes svelte-fjbi06-shadowPulse {
+  0%, 100% {
+    filter: drop-shadow(-1.5em 0 0 var(--_clr-accent)) drop-shadow(1.5em 0 0 var(--_clr));
+    background-color: var(--_clr);
+  }
+  33.33333% {
+    filter: drop-shadow(-1.5em 0 0 var(--_clr)) drop-shadow(1.5em 0 0 var(--_clr));
+    background-color: var(--_clr-accent);
+  }
+  66.66667% {
+    filter: drop-shadow(-1.5em 0 0 var(--_clr)) drop-shadow(1.5em 0 0 var(--_clr-accent));
+    background-color: var(--_clr);
+  }
+}
+.event-list.svelte-15qbi6x {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
-.pprek_calendar-event-list_item {
+
+.event.svelte-15qbi6x {
   --_block-size: 3.5rem;
   background-color: var(--clr-header-bg);
-  filter: drop-shadow(0 0.25rem 1rem hsla(0, 0%, 0%, 0.2));
+  filter: drop-shadow(0 0.25rem 1rem hsl(0 0% 0%/20%));
   display: grid;
   block-size: var(--_block-size);
   grid-template: "date title" 1.875rem "date time" 1.625rem/var(--_block-size) auto;
@@ -9065,7 +9102,8 @@ body[data-mobile-nav=true] .site-nav > ul > li ul > li:where([role=separator]) {
   border-radius: 0.25rem;
   overflow: hidden;
 }
-.pprek_calendar-event-list_item_date {
+
+.event-date.svelte-15qbi6x {
   grid-area: date;
   background-color: var(--clr-accent-400);
   color: var(--clr-header-bg);
@@ -9077,27 +9115,29 @@ body[data-mobile-nav=true] .site-nav > ul > li ul > li:where([role=separator]) {
   font-weight: 600;
   line-height: 1;
   gap: 0.25rem;
+  span:where(.svelte-15qbi6x):nth-child(1) {
+    font-size: 1.25rem;
+  }
 }
-.pprek_calendar-event-list_item_date span:nth-child(1) {
-  font-size: 1.25rem;
-}
-.pprek_calendar-event-list_item_title {
+
+.event-title.svelte-15qbi6x {
   grid-area: title;
   padding-inline: 0.75rem;
   align-self: end;
+  a:where(.svelte-15qbi6x) {
+    color: inherit;
+    text-decoration: none;
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: transparent;
+      z-index: 0;
+    }
+  }
 }
-.pprek_calendar-event-list_item_title a {
-  color: inherit;
-  text-decoration: none;
-}
-.pprek_calendar-event-list_item_title a::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: transparent;
-  z-index: 0;
-}
-.pprek_calendar-event-list_item_time {
+
+.event-time.svelte-15qbi6x {
   grid-area: time;
   padding-inline: 0.75rem;
   align-self: start;
