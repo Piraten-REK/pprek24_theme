@@ -13,6 +13,9 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["svelte"]
   },
+  "include": ["assets/ts/**/*", "assets/ts/**/*.ts", "assets/svelte/**/*", "assets/svelte/**/*.svelte"],
+  "extends": "@tsconfig/svelte/tsconfig.json"
 }
