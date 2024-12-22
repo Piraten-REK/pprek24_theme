@@ -52,7 +52,7 @@ function pprek24_customize_defaults(): array {
     'favicon_msapplication_color'     =>  '#da532c',
     'favicon_msapplication_config'    =>  pprek24_get_default_browserconfig_xml(),
     'ogp_default_social_img'          =>  get_theme_file_uri('/assets/img/social.webp'),
-    'calendar_api_url'                => 'https://calendar.piraten-rek.de',
+    'calendar_api_url'                =>  'https://calendar.piraten-rek.de'
   ];
 }
 
@@ -104,6 +104,9 @@ function pprek24_customize_register(WP_Customize_Manager $wp_customize): void {
   ]);
   $wp_customize->add_setting('pprek24_calendar_api_url', [
     'default' => pprek24_customize_defaults()['calendar_api_url']
+  ]);
+  $wp_customize->add_setting('pprek24_calendar_page', [
+    'capability' => 'manage_options',
   ]);
 
   // Sections
@@ -245,8 +248,18 @@ function pprek24_customize_register(WP_Customize_Manager $wp_customize): void {
     ]
   ));
   $wp_customize->add_control(new WP_Customize_Control(
+    $wp_customize, 'pprek24_calendar_page', [
+      'priority'        =>  100,
+      'section'         =>  'static_front_page',
+      'label'           =>  __('Termin-Seite', 'pprek24'),
+      'type'            =>  'dropdown-pages',
+      'allow_addition'  =>  true,
+      'description'     =>  __('Hier werden Termine angezeigt.', 'pprek24'),
+    ]
+  ));
+  $wp_customize->add_control(new WP_Customize_Control(
     $wp_customize, 'pprek24_calendar_api_url', [
-      'priority'    =>  120,
+      'priority'    =>  110,
       'section'     =>  'static_front_page',
       'label'       =>  __('Kalender API-URL', 'pprek24'),
       'type'        =>  'url',
@@ -439,4 +452,40 @@ function pprek24_calendar_api_url(): string {
   }
 
   return $value;
+}
+
+function pprek24_calendar_page(): WP_Post | null {
+  $id = get_theme_mod('pprek24_calendar_path');
+
+  if (!$id) {
+    return null;
+  }
+  return get_post($id);
+}
+
+/**
+ * @param string $path
+ * @param 'http'|'https'|'relative'|'rest'|null $scheme
+ * @return string
+ */
+function pprek24_calendar_page_url(string $path = '', string $scheme = null): string {
+  $orig_scheme = $scheme;
+
+  $url = get_permalink(pprek24_calendar_page());
+
+  if (!in_array($scheme, ['http', 'https', 'relative'], true)) {
+    if (is_ssl()) {
+      $scheme = 'https';
+    } else {
+      $scheme = parse_url($url, PHP_URL_SCHEME);
+    }
+  }
+
+  $url = set_url_scheme($url, $scheme);
+
+  if ($path && is_string($path)) {
+    $url .= '/' . ltrim($path, '/');
+  }
+
+  return apply_filters('pprek24_calendar_page_url', $url, $scheme, $orig_scheme);
 }
