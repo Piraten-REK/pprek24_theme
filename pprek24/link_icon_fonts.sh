@@ -12,8 +12,12 @@ for src in ../../node_modules/bootstrap-icons/font/fonts/*; do
 
   # test if link already exists
   if [ ! -e $font ]; then
-    # create symlink
-    ln -s $src $font
+    # create symlink or copy
+    if [[ $CI == "true" ]]; then
+      cp -r $src $font
+    else
+      ln -s $src $font
+    fi
 
     # create .gitignore if not existent
     test ! -e .gitignore && touch .gitignore
