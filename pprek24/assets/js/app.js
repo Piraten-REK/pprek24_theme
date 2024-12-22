@@ -447,6 +447,12 @@ function useIfExists(it, callback, defaultValue = null) {
     }
     return callback(it);
 }
+function useIf(it, predicate, callback, defaultValue = null) {
+    if (predicate(it)) {
+        return callback(it);
+    }
+    return defaultValue;
+}
 const config = useIfExists(document.querySelector('#pprek_js_conf'), it => JSON.parse(it.textContent ?? '{}'), {});
 const dateFormatters = {
     twoDigitDayFormatter: new Intl.DateTimeFormat(undefined, { day: '2-digit' }),
@@ -564,7 +570,7 @@ const LOADING_ATTR_SYMBOL = Symbol('');
 
 /** @import { Equals } from '#client' */
 /** @type {Equals} */
-function equals(value) {
+function equals$1(value) {
 	return value === this.v;
 }
 
@@ -674,6 +680,53 @@ function derived_references_self() {
 }
 
 /**
+ * `%rune%` cannot be used inside an effect cleanup function
+ * @param {string} rune
+ * @returns {never}
+ */
+function effect_in_teardown(rune) {
+	if (DEV) {
+		const error = new Error(`effect_in_teardown\n\`${rune}\` cannot be used inside an effect cleanup function\nhttps://svelte.dev/e/effect_in_teardown`);
+
+		error.name = 'Svelte error';
+		throw error;
+	} else {
+		throw new Error(`https://svelte.dev/e/effect_in_teardown`);
+	}
+}
+
+/**
+ * Effect cannot be created inside a `$derived` value that was not itself created inside an effect
+ * @returns {never}
+ */
+function effect_in_unowned_derived() {
+	if (DEV) {
+		const error = new Error(`effect_in_unowned_derived\nEffect cannot be created inside a \`$derived\` value that was not itself created inside an effect\nhttps://svelte.dev/e/effect_in_unowned_derived`);
+
+		error.name = 'Svelte error';
+		throw error;
+	} else {
+		throw new Error(`https://svelte.dev/e/effect_in_unowned_derived`);
+	}
+}
+
+/**
+ * `%rune%` can only be used inside an effect (e.g. during component initialisation)
+ * @param {string} rune
+ * @returns {never}
+ */
+function effect_orphan(rune) {
+	if (DEV) {
+		const error = new Error(`effect_orphan\n\`${rune}\` can only be used inside an effect (e.g. during component initialisation)\nhttps://svelte.dev/e/effect_orphan`);
+
+		error.name = 'Svelte error';
+		throw error;
+	} else {
+		throw new Error(`https://svelte.dev/e/effect_orphan`);
+	}
+}
+
+/**
  * Maximum update depth exceeded. This can happen when a reactive block or effect repeatedly sets a new value. Svelte limits the number of nested updates to prevent infinite loops
  * @returns {never}
  */
@@ -701,6 +754,22 @@ function props_invalid_value(key) {
 		throw error;
 	} else {
 		throw new Error(`https://svelte.dev/e/props_invalid_value`);
+	}
+}
+
+/**
+ * Rest element properties of `$props()` such as `%property%` are readonly
+ * @param {string} property
+ * @returns {never}
+ */
+function props_rest_readonly(property) {
+	if (DEV) {
+		const error = new Error(`props_rest_readonly\nRest element properties of \`$props()\` such as \`${property}\` are readonly\nhttps://svelte.dev/e/props_rest_readonly`);
+
+		error.name = 'Svelte error';
+		throw error;
+	} else {
+		throw new Error(`https://svelte.dev/e/props_rest_readonly`);
 	}
 }
 
@@ -873,7 +942,7 @@ function source(v, stack) {
 		f: 0, // TODO ideally we could skip this altogether, but it causes type errors
 		v,
 		reactions: null,
-		equals,
+		equals: equals$1,
 		version: 0
 	};
 
@@ -883,6 +952,14 @@ function source(v, stack) {
 	}
 
 	return signal;
+}
+
+/**
+ * @template V
+ * @param {V} v
+ */
+function state(v) {
+	return push_derived_source(source(v));
 }
 
 /**
@@ -905,6 +982,23 @@ function mutable_source(initial_value, immutable = false) {
 	}
 
 	return s;
+}
+
+/**
+ * @template V
+ * @param {Source<V>} source
+ */
+/*#__NO_SIDE_EFFECTS__*/
+function push_derived_source(source) {
+	if (active_reaction !== null && (active_reaction.f & DERIVED) !== 0) {
+		if (derived_sources === null) {
+			set_derived_sources([source]);
+		} else {
+			derived_sources.push(source);
+		}
+	}
+
+	return source;
 }
 
 /**
@@ -1651,6 +1745,20 @@ function strict_equals(a, b, equal = true) {
 	return (a === b) === equal;
 }
 
+/**
+ * @param {any} a
+ * @param {any} b
+ * @param {boolean} equal
+ * @returns {boolean}
+ */
+function equals(a, b, equal = true) {
+	if ((a == b) !== (get_proxied_value(a) == get_proxied_value(b))) {
+		state_proxy_equality_mismatch(equal ? '==' : '!=');
+	}
+
+	return (a == b) === equal;
+}
+
 /** @import { TemplateNode } from '#client' */
 
 // export these for reference in the compiled code, making global name deduplication unnecessary
@@ -1820,7 +1928,7 @@ function derived(fn) {
 		children: null,
 		ctx: component_context,
 		deps: null,
-		equals,
+		equals: equals$1,
 		f: flags,
 		fn,
 		reactions: null,
@@ -1967,6 +2075,23 @@ function destroy_derived(derived) {
 /** @import { ComponentContext, ComponentContextLegacy, Derived, Effect, TemplateNode, TransitionManager } from '#client' */
 
 /**
+ * @param {'$effect' | '$effect.pre' | '$inspect'} rune
+ */
+function validate_effect(rune) {
+	if (active_effect === null && active_reaction === null) {
+		effect_orphan(rune);
+	}
+
+	if (active_reaction !== null && (active_reaction.f & UNOWNED) !== 0) {
+		effect_in_unowned_derived();
+	}
+
+	if (is_destroying_effect) {
+		effect_in_teardown(rune);
+	}
+}
+
+/**
  * @param {Effect} effect
  * @param {Effect} parent_effect
  */
@@ -2065,6 +2190,40 @@ function create_effect(type, fn, sync, push = true) {
 }
 
 /**
+ * Internal representation of `$effect(...)`
+ * @param {() => void | (() => void)} fn
+ */
+function user_effect(fn) {
+	validate_effect('$effect');
+
+	// Non-nested `$effect(...)` in a component should be deferred
+	// until the component is mounted
+	var defer =
+		active_effect !== null &&
+		(active_effect.f & BRANCH_EFFECT) !== 0 &&
+		component_context !== null &&
+		!component_context.m;
+
+	if (DEV) {
+		define_property(fn, 'name', {
+			value: '$effect'
+		});
+	}
+
+	if (defer) {
+		var context = /** @type {ComponentContext} */ (component_context);
+		(context.e ??= []).push({
+			fn,
+			effect: active_effect,
+			reaction: active_reaction
+		});
+	} else {
+		var signal = effect(fn);
+		return signal;
+	}
+}
+
+/**
  * An effect root whose children can transition out
  * @param {() => void} fn
  * @returns {(options?: { outro?: boolean }) => Promise<void>}
@@ -2093,6 +2252,14 @@ function component_root(fn) {
  */
 function effect(fn) {
 	return create_effect(EFFECT, fn, false);
+}
+
+/**
+ * @param {() => void | (() => void)} fn
+ * @returns {Effect}
+ */
+function render_effect(fn) {
+	return create_effect(RENDER_EFFECT, fn, true);
 }
 
 /**
@@ -2130,11 +2297,14 @@ function branch(fn, push = true) {
 function execute_effect_teardown(effect) {
 	var teardown = effect.teardown;
 	if (teardown !== null) {
+		const previously_destroying_effect = is_destroying_effect;
 		const previous_reaction = active_reaction;
+		set_is_destroying_effect(true);
 		set_active_reaction(null);
 		try {
 			teardown.call(null);
 		} finally {
+			set_is_destroying_effect(previously_destroying_effect);
 			set_active_reaction(previous_reaction);
 		}
 	}
@@ -2434,10 +2604,16 @@ let is_micro_task_queued = false;
 let last_scheduled_effect = null;
 
 let is_flushing_effect = false;
+let is_destroying_effect = false;
 
 /** @param {boolean} value */
 function set_is_flushing_effect(value) {
 	is_flushing_effect = value;
+}
+
+/** @param {boolean} value */
+function set_is_destroying_effect(value) {
+	is_destroying_effect = value;
 }
 
 // Handle effect queues
@@ -2472,6 +2648,13 @@ function set_active_effect(effect) {
  * @type {null | Source[]}
  */
 let derived_sources = null;
+
+/**
+ * @param {Source[] | null} sources
+ */
+function set_derived_sources(sources) {
+	derived_sources = sources;
+}
 
 /**
  * The dependencies of the reaction that is currently being executed. In many cases,
@@ -3319,6 +3502,22 @@ function set_signal_status(signal, status) {
 }
 
 /**
+ * @template {number | bigint} T
+ * @param {Value<T>} signal
+ * @param {1 | -1} [d]
+ * @returns {T}
+ */
+function update(signal, d = 1) {
+	var value = get(signal);
+	var result = d === 1 ? value++ : value--;
+
+	set(signal, value);
+
+	// @ts-expect-error
+	return result;
+}
+
+/**
  * @param {Record<string, unknown>} props
  * @param {any} runes
  * @param {Function} [fn]
@@ -3425,6 +3624,74 @@ if (DEV) {
 }
 
 /**
+ * @param {string} name
+ */
+function is_capture_event(name) {
+	return name.endsWith('capture') && name !== 'gotpointercapture' && name !== 'lostpointercapture';
+}
+
+/** List of Element events that will be delegated */
+const DELEGATED_EVENTS = [
+	'beforeinput',
+	'click',
+	'change',
+	'dblclick',
+	'contextmenu',
+	'focusin',
+	'focusout',
+	'input',
+	'keydown',
+	'keyup',
+	'mousedown',
+	'mousemove',
+	'mouseout',
+	'mouseover',
+	'mouseup',
+	'pointerdown',
+	'pointermove',
+	'pointerout',
+	'pointerover',
+	'pointerup',
+	'touchend',
+	'touchmove',
+	'touchstart'
+];
+
+/**
+ * Returns `true` if `event_name` is a delegated event
+ * @param {string} event_name
+ */
+function is_delegated(event_name) {
+	return DELEGATED_EVENTS.includes(event_name);
+}
+
+/**
+ * @type {Record<string, string>}
+ * List of attribute names that should be aliased to their property names
+ * because they behave differently between setting them as an attribute and
+ * setting them as a property.
+ */
+const ATTRIBUTE_ALIASES = {
+	// no `class: 'className'` because we handle that separately
+	formnovalidate: 'formNoValidate',
+	ismap: 'isMap',
+	nomodule: 'noModule',
+	playsinline: 'playsInline',
+	readonly: 'readOnly',
+	defaultvalue: 'defaultValue',
+	defaultchecked: 'defaultChecked',
+	srcobject: 'srcObject'
+};
+
+/**
+ * @param {string} name
+ */
+function normalize_attribute(name) {
+	name = name.toLowerCase();
+	return ATTRIBUTE_ALIASES[name] ?? name;
+}
+
+/**
  * Subset of delegated events which should be passive by default.
  * These two are already passive via browser defaults on window, document and body.
  * But since
@@ -3496,6 +3763,41 @@ function assign_locations(node, filename, locations) {
 	}
 }
 
+/**
+ * @param {HTMLElement} dom
+ * @param {boolean} value
+ * @returns {void}
+ */
+function autofocus(dom, value) {
+	if (value) {
+		const body = document.body;
+		dom.autofocus = true;
+
+		queue_micro_task(() => {
+			if (document.activeElement === body) {
+				dom.focus();
+			}
+		});
+	}
+}
+
+/**
+ * @template T
+ * @param {() => T} fn
+ */
+function without_reactive_context(fn) {
+	var previous_reaction = active_reaction;
+	var previous_effect = active_effect;
+	set_active_reaction(null);
+	set_active_effect(null);
+	try {
+		return fn();
+	} finally {
+		set_active_reaction(previous_reaction);
+		set_active_effect(previous_effect);
+	}
+}
+
 /** @import { Location } from 'locate-character' */
 
 /** @type {Set<string>} */
@@ -3503,6 +3805,61 @@ const all_registered_events = new Set();
 
 /** @type {Set<(events: Array<string>) => void>} */
 const root_event_handles = new Set();
+
+/**
+ * @param {string} event_name
+ * @param {EventTarget} dom
+ * @param {EventListener} handler
+ * @param {AddEventListenerOptions} options
+ */
+function create_event(event_name, dom, handler, options) {
+	/**
+	 * @this {EventTarget}
+	 */
+	function target_handler(/** @type {Event} */ event) {
+		if (!options.capture) {
+			// Only call in the bubble phase, else delegated events would be called before the capturing events
+			handle_event_propagation.call(dom, event);
+		}
+		if (!event.cancelBubble) {
+			return without_reactive_context(() => {
+				return handler.call(this, event);
+			});
+		}
+	}
+
+	// Chrome has a bug where pointer events don't work when attached to a DOM element that has been cloned
+	// with cloneNode() and the DOM element is disconnected from the document. To ensure the event works, we
+	// defer the attachment till after it's been appended to the document. TODO: remove this once Chrome fixes
+	// this bug. The same applies to wheel events and touch events.
+	if (
+		event_name.startsWith('pointer') ||
+		event_name.startsWith('touch') ||
+		event_name === 'wheel'
+	) {
+		queue_micro_task(() => {
+			dom.addEventListener(event_name, target_handler, options);
+		});
+	} else {
+		dom.addEventListener(event_name, target_handler, options);
+	}
+
+	return target_handler;
+}
+
+/**
+ * @param {Array<string>} events
+ * @returns {void}
+ */
+function delegate(events) {
+	for (var i = 0; i < events.length; i++) {
+		all_registered_events.add(events[i]);
+	}
+
+	for (var fn of root_event_handles) {
+		fn(events);
+	}
+}
 
 /**
  * @this {EventTarget}
@@ -4585,6 +4942,25 @@ function wrap_snippet(component, fn) {
 }
 
 /**
+ * Sets the `selected` attribute on an `option` element.
+ * Not set through the property because that doesn't reflect to the DOM,
+ * which means it wouldn't be taken into account when a form is reset.
+ * @param {HTMLOptionElement} element
+ * @param {boolean} selected
+ */
+function set_selected(element, selected) {
+	if (selected) {
+		// The selected option could've changed via user selection, and
+		// setting the value without this check would set it back.
+		if (!element.hasAttribute('selected')) {
+			element.setAttribute('selected', '');
+		}
+	} else {
+		element.removeAttribute('selected');
+	}
+}
+
+/**
  * @param {Element} element
  * @param {string} attribute
  * @param {string | null} value
@@ -4614,6 +4990,172 @@ function set_attribute(element, attribute, value, skip_warning) {
 	} else {
 		element.setAttribute(attribute, value);
 	}
+}
+
+/**
+ * Spreads attributes onto a DOM element, taking into account the currently set attributes
+ * @param {Element & ElementCSSInlineStyle} element
+ * @param {Record<string, any> | undefined} prev
+ * @param {Record<string, any>} next New attributes - this function mutates this object
+ * @param {string} [css_hash]
+ * @param {boolean} [preserve_attribute_case]
+ * @param {boolean} [is_custom_element]
+ * @param {boolean} [skip_warning]
+ * @returns {Record<string, any>}
+ */
+function set_attributes(
+	element,
+	prev,
+	next,
+	css_hash,
+	preserve_attribute_case = false,
+	is_custom_element = false,
+	skip_warning = false
+) {
+	var current = prev || {};
+	var is_option_element = element.tagName === 'OPTION';
+
+	for (var key in prev) {
+		if (!(key in next)) {
+			next[key] = null;
+		}
+	}
+
+	var setters = get_setters(element);
+
+	// @ts-expect-error
+	var attributes = /** @type {Record<string, unknown>} **/ (element.__attributes ??= {});
+
+	// since key is captured we use const
+	for (const key in next) {
+		// let instead of var because referenced in a closure
+		let value = next[key];
+
+		// Up here because we want to do this for the initial value, too, even if it's undefined,
+		// and this wouldn't be reached in case of undefined because of the equality check below
+		if (is_option_element && key === 'value' && value == null) {
+			// The <option> element is a special case because removing the value attribute means
+			// the value is set to the text content of the option element, and setting the value
+			// to null or undefined means the value is set to the string "null" or "undefined".
+			// To align with how we handle this case in non-spread-scenarios, this logic is needed.
+			// There's a super-edge-case bug here that is left in in favor of smaller code size:
+			// Because of the "set missing props to null" logic above, we can't differentiate
+			// between a missing value and an explicitly set value of null or undefined. That means
+			// that once set, the value attribute of an <option> element can't be removed. This is
+			// a very rare edge case, and removing the attribute altogether isn't possible either
+			// for the <option value={undefined}> case, so we're not losing any functionality here.
+			// @ts-ignore
+			element.value = element.__value = '';
+			current[key] = value;
+			continue;
+		}
+
+		var prev_value = current[key];
+		if (value === prev_value) continue;
+
+		current[key] = value;
+
+		var prefix = key[0] + key[1]; // this is faster than key.slice(0, 2)
+		if (prefix === '$$') continue;
+
+		if (prefix === 'on') {
+			/** @type {{ capture?: true }} */
+			const opts = {};
+			const event_handle_key = '$$' + key;
+			let event_name = key.slice(2);
+			var delegated = is_delegated(event_name);
+
+			if (is_capture_event(event_name)) {
+				event_name = event_name.slice(0, -7);
+				opts.capture = true;
+			}
+
+			if (!delegated && prev_value) {
+				// Listening to same event but different handler -> our handle function below takes care of this
+				// If we were to remove and add listeners in this case, it could happen that the event is "swallowed"
+				// (the browser seems to not know yet that a new one exists now) and doesn't reach the handler
+				// https://github.com/sveltejs/svelte/issues/11903
+				if (value != null) continue;
+
+				element.removeEventListener(event_name, current[event_handle_key], opts);
+				current[event_handle_key] = null;
+			}
+
+			if (value != null) {
+				if (!delegated) {
+					/**
+					 * @this {any}
+					 * @param {Event} evt
+					 */
+					function handle(evt) {
+						current[key].call(this, evt);
+					}
+
+					current[event_handle_key] = create_event(event_name, element, handle, opts);
+				} else {
+					// @ts-ignore
+					element[`__${event_name}`] = value;
+					delegate([event_name]);
+				}
+			} else if (delegated) {
+				// @ts-ignore
+				element[`__${event_name}`] = undefined;
+			}
+		} else if (key === 'style' && value != null) {
+			element.style.cssText = value + '';
+		} else if (key === 'autofocus') {
+			autofocus(/** @type {HTMLElement} */ (element), Boolean(value));
+		} else if (key === '__value' || (key === 'value' && value != null)) {
+			// @ts-ignore
+			element.value = element[key] = element.__value = value;
+		} else if (key === 'selected' && is_option_element) {
+			set_selected(/** @type {HTMLOptionElement} */ (element), value);
+		} else {
+			var name = key;
+			if (!preserve_attribute_case) {
+				name = normalize_attribute(name);
+			}
+
+			var is_default = name === 'defaultValue' || name === 'defaultChecked';
+
+			if (value == null && !is_custom_element && !is_default) {
+				attributes[key] = null;
+
+				if (name === 'value' || name === 'checked') {
+					// removing value/checked also removes defaultValue/defaultChecked — preserve
+					let input = /** @type {HTMLInputElement} */ (element);
+
+					if (name === 'value') {
+						let prev = input.defaultValue;
+						input.removeAttribute(name);
+						input.defaultValue = prev;
+					} else {
+						let prev = input.defaultChecked;
+						input.removeAttribute(name);
+						input.defaultChecked = prev;
+					}
+				} else {
+					element.removeAttribute(key);
+				}
+			} else if (
+				is_default ||
+				(setters.includes(name) && (is_custom_element || typeof value !== 'string'))
+			) {
+				// @ts-ignore
+				element[name] = value;
+			} else if (typeof value !== 'function') {
+				{
+					set_attribute(element, name, value);
+				}
+			}
+		}
+		if (key === 'style' && '__styles' in element) {
+			// reset styles to force style: directive to update
+			element.__styles = {};
+		}
+	}
+
+	return current;
 }
 
 /** @type {Map<string, string[]>} */
@@ -4646,7 +5188,154 @@ function get_setters(element) {
 	return setters;
 }
 
+/**
+ * @param {Element} dom
+ * @param {string} class_name
+ * @param {boolean} value
+ * @returns {void}
+ */
+function toggle_class(dom, class_name, value) {
+	if (value) {
+		if (dom.classList.contains(class_name)) return;
+		dom.classList.add(class_name);
+	} else {
+		if (!dom.classList.contains(class_name)) return;
+		dom.classList.remove(class_name);
+	}
+}
+
+/**
+ * @param {HTMLElement} dom
+ * @param {string} key
+ * @param {string} value
+ * @param {boolean} [important]
+ */
+function set_style(dom, key, value, important) {
+	// @ts-expect-error
+	var styles = (dom.__styles ??= {});
+
+	if (styles[key] === value) {
+		return;
+	}
+
+	styles[key] = value;
+
+	if (value == null) {
+		dom.style.removeProperty(key);
+	} else {
+		dom.style.setProperty(key, value, '');
+	}
+}
+
+/**
+ * @param {any} bound_value
+ * @param {Element} element_or_component
+ * @returns {boolean}
+ */
+function is_bound_this(bound_value, element_or_component) {
+	return (
+		bound_value === element_or_component || bound_value?.[STATE_SYMBOL] === element_or_component
+	);
+}
+
+/**
+ * @param {any} element_or_component
+ * @param {(value: unknown, ...parts: unknown[]) => void} update
+ * @param {(...parts: unknown[]) => unknown} get_value
+ * @param {() => unknown[]} [get_parts] Set if the this binding is used inside an each block,
+ * 										returns all the parts of the each block context that are used in the expression
+ * @returns {void}
+ */
+function bind_this(element_or_component = {}, update, get_value, get_parts) {
+	effect(() => {
+		/** @type {unknown[]} */
+		var old_parts;
+
+		/** @type {unknown[]} */
+		var parts;
+
+		render_effect(() => {
+			old_parts = parts;
+			// We only track changes to the parts, not the value itself to avoid unnecessary reruns.
+			parts = [];
+
+			untrack(() => {
+				if (element_or_component !== get_value(...parts)) {
+					update(element_or_component, ...parts);
+					// If this is an effect rerun (cause: each block context changes), then nullfiy the binding at
+					// the previous position if it isn't already taken over by a different effect.
+					if (old_parts && is_bound_this(get_value(...old_parts), element_or_component)) {
+						update(null, ...old_parts);
+					}
+				}
+			});
+		});
+
+		return () => {
+			// We cannot use effects in the teardown phase, we we use a microtask instead.
+			queue_micro_task(() => {
+				if (parts && is_bound_this(get_value(...parts), element_or_component)) {
+					update(null, ...parts);
+				}
+			});
+		};
+	});
+
+	return element_or_component;
+}
+
 /** @import { Source } from './types.js' */
+
+/**
+ * The proxy handler for rest props (i.e. `const { x, ...rest } = $props()`).
+ * Is passed the full `$$props` object and excludes the named props.
+ * @type {ProxyHandler<{ props: Record<string | symbol, unknown>, exclude: Array<string | symbol>, name?: string }>}}
+ */
+const rest_props_handler = {
+	get(target, key) {
+		if (target.exclude.includes(key)) return;
+		return target.props[key];
+	},
+	set(target, key) {
+		if (DEV) {
+			// TODO should this happen in prod too?
+			props_rest_readonly(`${target.name}.${String(key)}`);
+		}
+
+		return false;
+	},
+	getOwnPropertyDescriptor(target, key) {
+		if (target.exclude.includes(key)) return;
+		if (key in target.props) {
+			return {
+				enumerable: true,
+				configurable: true,
+				value: target.props[key]
+			};
+		}
+	},
+	has(target, key) {
+		if (target.exclude.includes(key)) return false;
+		return key in target.props;
+	},
+	ownKeys(target) {
+		return Reflect.ownKeys(target.props).filter((key) => !target.exclude.includes(key));
+	}
+};
+
+/**
+ * @param {Record<string, unknown>} props
+ * @param {string[]} exclude
+ * @param {string} [name]
+ * @returns {Record<string, unknown>}
+ */
+/*#__NO_SIDE_EFFECTS__*/
+function rest_props(props, exclude, name) {
+	return new Proxy(
+		DEV ? { props, exclude, name, other: {}, to_proxy: [] } : { props, exclude },
+		rest_props_handler
+	);
+}
 
 /**
  * @template T
@@ -4784,13 +5473,13 @@ enable_legacy_mode_flag();
 mark_module_start();
 Loader[FILENAME] = "assets/svelte/Loader.svelte";
 
-var root$1 = add_locations(template(`<div class="pprek24-loader svelte-fjbi06"></div>`), Loader[FILENAME], [[1, 0]]);
+var root$3 = add_locations(template(`<div class="pprek24-loader svelte-fjbi06"></div>`), Loader[FILENAME], [[1, 0]]);
 
 function Loader($$anchor, $$props) {
 	check_target(new.target);
 	push($$props, false, Loader);
 
-	var div = root$1();
+	var div = root$3();
 
 	append($$anchor, div);
 	return pop({ ...legacy_api() });
@@ -4801,23 +5490,24 @@ mark_module_end(Loader);
 mark_module_start();
 CalendarNextEvents[FILENAME] = "assets/svelte/CalendarNextEvents.svelte";
 
-var root_5 = add_locations(template(`ganztägig bis <time> </time>`, 1), CalendarNextEvents[FILENAME], [[56, 27]]);
-var root_6 = add_locations(template(`<time> </time> bis <time><!> </time>`, 1), CalendarNextEvents[FILENAME], [[58, 12], [59, 12]]);
+var root_5$1 = add_locations(template(`ganztägig bis <time> </time>`, 1), CalendarNextEvents[FILENAME], [[59, 28]]);
+var root_6$1 = add_locations(template(`<time> </time> bis <time><!> </time>`, 1), CalendarNextEvents[FILENAME], [[61, 14], [62, 14]]);
 
-var root_2$1 = add_locations(template(`<article class="event svelte-15qbi6x"><div class="event-title svelte-15qbi6x"><a class="svelte-15qbi6x"> </a></div> <time class="event-date svelte-15qbi6x"><span class="svelte-15qbi6x"> </span> <span class="svelte-15qbi6x"> </span></time> <span class="event-time svelte-15qbi6x"><!></span></article>`), CalendarNextEvents[FILENAME], [
+var root_2$1 = add_locations(template(`<li class="event svelte-guwymb"><div class="event-title svelte-guwymb"><a class="svelte-guwymb"> </a></div> <time class="event-date svelte-guwymb"><span class="svelte-guwymb"> </span> <span class="svelte-guwymb"> </span></time> <span class="event-time svelte-guwymb"><!></span></li>`), CalendarNextEvents[FILENAME], [
 	[
-		32,
-		6,
+		35,
+		8,
 		[
-			[39, 8, [[40, 10]]],
-			[42, 8, [[47, 10], [48, 10]]],
-			[50, 8]
+			[42, 10, [[43, 12]]],
+			[45, 10, [[50, 12], [51, 12]]],
+			[53, 10]
 		]
 	]
 ]);
 
-var root_1$1 = add_locations(template(`<div class="event-list svelte-15qbi6x"></div>`), CalendarNextEvents[FILENAME], [[27, 2]]);
-var root_8 = add_locations(template(`<div>Error</div> <pre> </pre>`, 1), CalendarNextEvents[FILENAME], [[71, 2], [72, 2]]);
+var root_1$1 = add_locations(template(`<ul class="event-list svelte-guwymb"></ul>`), CalendarNextEvents[FILENAME], [[30, 4]]);
+var root_8$1 = add_locations(template(`<div>Error</div> <pre> </pre>`, 1), CalendarNextEvents[FILENAME], [[74, 4], [75, 4]]);
+var root$2 = add_locations(template(`<div aria-live="off" aria-atomic="true"><!></div>`), CalendarNextEvents[FILENAME], [[26, 0]]);
 
 function CalendarNextEvents($$anchor, $$props) {
 	check_target(new.target);
@@ -4825,6 +5515,7 @@ function CalendarNextEvents($$anchor, $$props) {
 	validate_prop_bindings($$props, [], [], CalendarNextEvents);
 
 	const id = prop($$props, "id", 19, () => getRandomId(6, 'calendar-next-events_'));
+	let busy = state(true);
 
 	let events = proxy(fetch(` ${config.calendar_api_url}/next`, { cache: 'default' }).then(async (res) => {
 		if (strict_equals(res.status, 200, false) && strict_equals(res.status, 304, false) && strict_equals(res.headers.get('X-API-Version'), '2', false)) {
@@ -4832,10 +5523,10 @@ function CalendarNextEvents($$anchor, $$props) {
 		}
 
 		return await res.json();
-	}).then((res) => res.events));
+	}).then((res) => res.events).finally(() => set(busy, false)));
 
-	var fragment = comment();
-	var node = first_child(fragment);
+	var div = root$2();
+	var node = child(div);
 
 	await_block(
 		node,
@@ -4844,10 +5535,10 @@ function CalendarNextEvents($$anchor, $$props) {
 			Loader($$anchor, {});
 		},
 		($$anchor, events) => {
-			var div = root_1$1();
+			var ul = root_1$1();
 
-			each(div, 21, () => get(events), index, ($$anchor, event, index) => {
-				var article = root_2$1();
+			each(ul, 21, () => get(events), index, ($$anchor, event, index) => {
+				var li = root_2$1();
 
 				const query = derived(() => new URLSearchParams({
 					start: get(event).start,
@@ -4864,9 +5555,9 @@ function CalendarNextEvents($$anchor, $$props) {
 				const endDate = derived(() => new Date(get(event).end));
 
 				get(endDate);
-				set_attribute(article, "aria-posinset", index + 1);
+				set_attribute(li, "aria-posinset", index + 1);
 
-				var div_1 = child(article);
+				var div_1 = child(li);
 				var a = child(div_1);
 
 				template_effect(() => set_attribute(a, "href", `/calendar?${get(query).toString() ?? ""}`));
@@ -4904,24 +5595,24 @@ function CalendarNextEvents($$anchor, $$props) {
 					};
 
 					var alternate_1 = ($$anchor) => {
-						var fragment_1 = comment();
-						var node_2 = first_child(fragment_1);
+						var fragment = comment();
+						var node_2 = first_child(fragment);
 
 						{
 							var consequent_1 = ($$anchor) => {
-								var fragment_2 = root_5();
-								var time_1 = sibling(first_child(fragment_2));
+								var fragment_1 = root_5$1();
+								var time_1 = sibling(first_child(fragment_1));
 								var text_4 = child(time_1, true);
 
 								template_effect(() => set_text(text_4, dateFormatters.longDateFormatter.format(get(endDate))));
 								reset(time_1);
 								template_effect(() => set_attribute(time_1, "datetime", get(event).end));
-								append($$anchor, fragment_2);
+								append($$anchor, fragment_1);
 							};
 
 							var alternate = ($$anchor) => {
-								var fragment_3 = root_6();
-								var time_2 = first_child(fragment_3);
+								var fragment_2 = root_6$1();
+								var time_2 = first_child(fragment_2);
 								var text_5 = child(time_2);
 
 								template_effect(() => set_text(text_5, `${dateFormatters.shortTimeFormatter.format(get(startDate)) ?? ""} Uhr`));
@@ -4953,7 +5644,7 @@ function CalendarNextEvents($$anchor, $$props) {
 									set_attribute(time_3, "datetime", get(event).end);
 								});
 
-								append($$anchor, fragment_3);
+								append($$anchor, fragment_2);
 							};
 
 							if_block(
@@ -4965,7 +5656,7 @@ function CalendarNextEvents($$anchor, $$props) {
 							);
 						}
 
-						append($$anchor, fragment_1);
+						append($$anchor, fragment);
 					};
 
 					if_block(node_1, ($$render) => {
@@ -4974,60 +5665,118 @@ function CalendarNextEvents($$anchor, $$props) {
 				}
 
 				reset(span_2);
-				reset(article);
+				reset(li);
 
 				template_effect(() => {
-					set_attribute(article, "aria-labelledby", `${id() ?? ""}_$${index ?? ""}_title`);
-					set_attribute(article, "aria-describedby", `${id() ?? ""}_${index ?? ""}_date ${id() ?? ""}_${index ?? ""}_time`);
-					set_attribute(article, "aria-setsize", get(events).length);
+					set_attribute(li, "aria-labelledby", `${id() ?? ""}_$${index ?? ""}_title`);
+					set_attribute(li, "aria-describedby", `${id() ?? ""}_${index ?? ""}_date ${id() ?? ""}_${index ?? ""}_time`);
+					set_attribute(li, "aria-setsize", get(events).length);
 					set_attribute(div_1, "id", `${id() ?? ""}_${index ?? ""}_title`);
 					set_text(text$1, get(event).title);
 					set_attribute(time, "id", `${id() ?? ""}_${index ?? ""}_date`);
 					set_attribute(span_2, "id", `${id() ?? ""}_${index ?? ""}_time`);
 				});
 
-				append($$anchor, article);
+				append($$anchor, li);
 			});
 
-			reset(div);
-			template_effect(() => set_attribute(div, "id", id()));
-			append($$anchor, div);
+			reset(ul);
+			template_effect(() => set_attribute(ul, "id", id()));
+			append($$anchor, ul);
 		},
 		($$anchor, error) => {
-			var fragment_5 = root_8();
-			var pre = sibling(first_child(fragment_5), 2);
+			var fragment_4 = root_8$1();
+			var pre = sibling(first_child(fragment_4), 2);
 			var text_8 = child(pre, true);
 
 			reset(pre);
 			template_effect(() => set_text(text_8, get(error)));
-			append($$anchor, fragment_5);
+			append($$anchor, fragment_4);
 		}
 	);
-
-	append($$anchor, fragment);
+	template_effect(() => set_attribute(div, "aria-busy", get(busy)));
+	append($$anchor, div);
 	return pop({ ...legacy_api() });
 }
 
 mark_module_end(CalendarNextEvents);
 
 mark_module_start();
+Icon[FILENAME] = "assets/svelte/Icon.svelte";
+
+var root$1 = add_locations(template(`<i></i>`), Icon[FILENAME], [[17, 0]]);
+
+function Icon($$anchor, $$props) {
+	check_target(new.target);
+	push($$props, true, Icon);
+	validate_prop_bindings($$props, [], [], Icon);
+
+	const rest = rest_props(
+		$$props,
+		[
+			"$$slots",
+			"$$events",
+			"$$legacy",
+			"icon",
+			"class"
+		],
+		"rest"
+	);
+
+	const classes = ['bi'];
+
+	classes.push(`bi-${$$props.icon.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
+
+	if (equals($$props.class, null, false)) {
+		classes.push($$props.class);
+	}
+
+	const className = proxy(classes.join(' '));
+	var i = root$1();
+	let attributes;
+
+	template_effect(() => attributes = set_attributes(i, attributes, { class: className, role: "img", ...rest }));
+	append($$anchor, i);
+	return pop({ ...legacy_api() });
+}
+
+mark_module_end(Icon);
+
+mark_module_start();
 CalendarMonth[FILENAME] = "assets/svelte/CalendarMonth.svelte";
 
-var root_1 = add_locations(template(`<th> </th>`), CalendarMonth[FILENAME], [[72, 8]]);
-var root_3 = add_locations(template(`<td> </td>`), CalendarMonth[FILENAME], [[89, 10]]);
-var root_2 = add_locations(template(`<tr></tr>`), CalendarMonth[FILENAME], [[87, 6]]);
-
-var root = add_locations(template(`<table><caption> </caption><thead><tr><!><!><!><!><!><!><!></tr></thead><tbody></tbody></table>`), CalendarMonth[FILENAME], [
+var root_2 = add_locations(template(`<th class="svelte-pb28ll"><span class="pprek-calendar-weekday--long"> </span> <span class="pprek-calendar-weekday--short" aria-hidden="true"> </span></th>`), CalendarMonth[FILENAME], [
 	[
-		66,
-		0,
+		153,
+		12,
+		[[154, 14], [155, 14]]
+	]
+]);
+
+var root_7 = add_locations(template(`<time class="svelte-pb28ll"> </time>`), CalendarMonth[FILENAME], [[187, 26]]);
+var root_6 = add_locations(template(`<li class="svelte-pb28ll"><a class="svelte-pb28ll"><!> </a></li>`), CalendarMonth[FILENAME], [[184, 22, [[185, 24]]]]);
+var root_5 = add_locations(template(`<ul class="svelte-pb28ll"></ul>`), CalendarMonth[FILENAME], [[181, 18]]);
+var root_4 = add_locations(template(`<td role="gridcell" class="svelte-pb28ll"> <!></td>`), CalendarMonth[FILENAME], [[171, 14]]);
+var root_3 = add_locations(template(`<tr class="svelte-pb28ll"></tr>`), CalendarMonth[FILENAME], [[169, 10]]);
+
+var root_1 = add_locations(template(`<header class="pprek-calendar-month-title svelte-pb28ll"><button class="pprek-calendar-month-prev svelte-pb28ll"><!></button> <h2 class="svelte-pb28ll"> </h2> <button class="pprek-calendar-month-next svelte-pb28ll"><!></button></header> <table class="pprek-calendar-month svelte-pb28ll" role="grid"><thead aria-hidden="true" class="svelte-pb28ll"><tr class="svelte-pb28ll"><!><!><!><!><!><!><!></tr></thead><tbody class="svelte-pb28ll"></tbody></table>`, 1), CalendarMonth[FILENAME], [
+	[
+		143,
+		4,
+		[[144, 6], [145, 6], [146, 6]]
+	],
+	[
+		148,
+		4,
 		[
-			[67, 2],
-			[68, 2, [[69, 4]]],
-			[85, 2]
+			[149, 6, [[150, 8]]],
+			[167, 6]
 		]
 	]
 ]);
+
+var root_8 = add_locations(template(`<div>Error</div> <pre> </pre>`, 1), CalendarMonth[FILENAME], [[202, 4], [203, 4]]);
+var root = add_locations(template(`<div aria-live="off" aria-atomic="true"><!></div>`), CalendarMonth[FILENAME], [[139, 0]]);
 
 function CalendarMonth($$anchor, $$props) {
 	check_target(new.target);
@@ -5035,122 +5784,344 @@ function CalendarMonth($$anchor, $$props) {
 	validate_prop_bindings($$props, [], [], CalendarMonth);
 
 	const now = new Date();
+	const id = prop($$props, "id", 19, () => getRandomId(6, 'calendar-next-events_'));
+	let year = state(proxy($$props.year ?? now.getFullYear()));
+	let month = state(proxy($$props.month ?? now.getMonth() + 1));
+	let wrapper;
+	let longTitles = state(true);
 
-	const year = prop($$props, "year", 19, () => now.getFullYear()),
-		month = prop($$props, "month", 19, () => now.getMonth() + 1);
+	const prev = () => {
+		update(month, -1);
 
-	const firstOfMonth = new Date(year(), month() - 1, 1, 0, 0, 0, 0);
-	const firstVisible = new Date(firstOfMonth);
+		if (strict_equals(get(month), 0)) {
+			set(month, 12);
+			update(year, -1);
+		}
 
-	firstVisible.setDate(-1 * ((firstVisible.getDay() + 6) % 7) + 1);
+		const url = window.location.href.split('?')[0];
 
-	const events = proxy([]);
+		const query = new URLSearchParams({
+			year: get(year).toString(),
+			month: get(month).toString()
+		});
 
-	const days = derived(() => {
-		// @ts-expect-error
-		const res = new Array(6).fill(null).map(() => new Array(7).fill(null));
-		const date = new Date(firstVisible);
+		window.history.pushState(
+			{
+				year: get(year),
+				month: get(month)
+			},
+			'',
+			`${url}?${query}`
+		);
+	};
+
+	const next = () => {
+		update(month);
+
+		if (strict_equals(get(month), 13)) {
+			set(month, 1);
+			update(year);
+		}
+
+		const url = window.location.href.split('?')[0];
+
+		const query = new URLSearchParams({
+			year: get(year).toString(),
+			month: get(month).toString()
+		});
+
+		window.history.pushState(
+			{
+				year: get(year),
+				month: get(month)
+			},
+			'',
+			`${url}?${query}`
+		);
+	};
+
+	let firstOfMonth = derived(() => new Date(get(year), get(month) - 1, 1, 0, 0, 0, 0));
+
+	let firstVisible = derived(() => {
+		const d = new Date(get(firstOfMonth));
+
+		d.setDate(-1 * ((d.getDay() + 6) % 7) + 1);
+		return d;
+	});
+
+	let busy = state(true);
+
+	let req = derived(() => fetch(` ${config.calendar_api_url}/${get(year)}/${get(month)}`, { cache: 'default' }).then(async (res) => {
+		if (strict_equals(res.status, 200, false) && strict_equals(res.status, 304, false) && strict_equals(res.headers.get('X-API-Version'), '2', false)) {
+			throw new Error(await res.json());
+		}
+
+		return await res.json();
+	}).then((res) => {
+		const days = new Array(6).fill(null).map(() => new Array(7).fill(null));
+		const date = new Date(get(firstVisible));
 
 		for (let w = 0; w < 6; w++) {
 			for (let d = 0; d < 7; d++) {
-				const events_ = events.filter((event) => eventAffectsDate(event, date));
+				const events = res.events.filter((event) => eventAffectsDate(event, date));
 
-				res[w][d] = {
+				days[w][d] = {
 					dateString: `${date.getFullYear()}-${leftPad(date.getMonth() + 1)}-${leftPad(date.getDate())}`,
 					day: date.getDate(),
 					label: dateFormatters.longDateFormatter.format(date),
-					events: events_,
-					eventFul: events_.length > 0,
-					type: events_.length > 0 ? 'eventful' : 'eventless',
-					position: strict_equals(date.getMonth() + 1, date.getMonth()) ? 'in-month' : 'out-of-month'
+					events,
+					eventFul: events.length > 0,
+					type: events.length > 0 ? 'eventful' : 'eventless',
+					position: strict_equals(date.getMonth() + 1, get(month)) ? 'in-month' : 'out-of-month'
 				};
 
 				date.setHours(24);
 			}
 		}
 
-		return res;
+		return Object.assign(res, { days });
+	}).finally(() => set(busy, false)));
+
+	user_effect(() => {
+		if (strict_equals(wrapper, undefined)) {
+			return;
+		}
+
+		const headerCells = Array.from(wrapper.querySelectorAll('thead tr th'));
+		const padding = getComputedStyle(headerCells[0]).paddingInline.split(' ').reduce((acc, cur) => acc + parseInt(cur), 0);
+		const maxWidth = headerCells[0].getBoundingClientRect().width - padding;
+
+		for (const cell of headerCells) {
+			const longText = cell.querySelector('.pprek-calendar-weekday--long');
+
+			if (maxWidth < longText.getBoundingClientRect().width) {
+				set(longTitles, false);
+				return;
+			}
+		}
+
+		set(longTitles, true);
 	});
 
-	var table = root();
-	var caption = child(table);
-	var text = child(caption);
+	var div = root();
+	var node = child(div);
 
-	template_effect(() => set_text(text, `Unsere Termine im ${dateFormatters.longMonthFormatter.format(firstOfMonth) ?? ""}`));
+	await_block(
+		node,
+		() => get(req),
+		($$anchor) => {
+			Loader($$anchor, {});
+		},
+		($$anchor, $$source) => {
+			var $$value = derived(() => {
+				var { days } = get($$source);
 
-	var thead = sibling(caption);
-	var tr = child(thead);
-
-	{
-		const th = wrap_snippet(CalendarMonth, ($$anchor, day = noop) => {
-			var th_1 = root_1();
-			const date = derived(() => new Date(2024, 11, 1 + day(), 0, 0, 0, 0));
-
-			get(date);
-			template_effect(() => set_attribute(th_1, "title", dateFormatters.longWeekDayFormatter.format(get(date))));
-
-			var text_1 = child(th_1, true);
-
-			template_effect(() => set_text(text_1, dateFormatters.shortWeekDayFormatter.format(get(date))));
-			reset(th_1);
-			append($$anchor, th_1);
-		});
-
-		var node = child(tr);
-
-		th(node, () => 1);
-
-		var node_1 = sibling(node);
-
-		th(node_1, () => 2);
-
-		var node_2 = sibling(node_1);
-
-		th(node_2, () => 3);
-
-		var node_3 = sibling(node_2);
-
-		th(node_3, () => 4);
-
-		var node_4 = sibling(node_3);
-
-		th(node_4, () => 5);
-
-		var node_5 = sibling(node_4);
-
-		th(node_5, () => 6);
-
-		var node_6 = sibling(node_5);
-
-		th(node_6, () => 7);
-	}
-
-	var tbody = sibling(thead);
-
-	each(tbody, 21, () => get(days), index, ($$anchor, week) => {
-		var tr_1 = root_2();
-
-		each(tr_1, 21, () => get(week), index, ($$anchor, day) => {
-			var td = root_3();
-			var text_2 = child(td);
-
-			template_effect(() => {
-				set_attribute(td, "aria-label", get(day).label);
-				set_attribute(td, "data-day", get(day).dateString);
-				set_attribute(td, "data-position", get(day).position);
-				set_attribute(td, "data-type", get(day).type);
-				set_text(text_2, get(day).day);
+				return { days };
 			});
 
-			append($$anchor, td);
-		});
-		append($$anchor, tr_1);
-	});
-	append($$anchor, table);
+			var days = derived(() => get($$value).days);
+			var fragment = root_1();
+			var header = first_child(fragment);
+			var button = child(header);
+
+			button.__click = prev;
+
+			var node_1 = child(button);
+
+			Icon(node_1, { icon: "caretLeftFill", "aria-hidden": "true" });
+			reset(button);
+
+			var h2 = sibling(button, 2);
+			var text = child(h2);
+
+			template_effect(() => set_text(text, `Unsere Termine im ${dateFormatters.longMonthFormatter.format(get(firstOfMonth)) ?? ""}`));
+			reset(h2);
+
+			var button_1 = sibling(h2, 2);
+
+			button_1.__click = next;
+
+			var node_2 = child(button_1);
+
+			Icon(node_2, { icon: "caretRightFill", "aria-hidden": "true" });
+			reset(button_1);
+			reset(header);
+
+			var table = sibling(header, 2);
+			var thead = child(table);
+			var tr = child(thead);
+
+			{
+				const th = wrap_snippet(CalendarMonth, ($$anchor, day = noop) => {
+					var th_1 = root_2();
+					const date = derived(() => new Date(2024, 11, 1 + day(), 0, 0, 0, 0));
+
+					get(date);
+
+					var span = child(th_1);
+					var text_1 = child(span, true);
+
+					template_effect(() => set_text(text_1, dateFormatters.longWeekDayFormatter.format(get(date))));
+					reset(span);
+
+					var span_1 = sibling(span, 2);
+					var text_2 = child(span_1, true);
+
+					template_effect(() => set_text(text_2, dateFormatters.shortWeekDayFormatter.format(get(date))));
+					reset(span_1);
+					reset(th_1);
+
+					template_effect(() => {
+						toggle_class(span, "sr-only", !get(longTitles));
+						set_style(span_1, "display", get(longTitles) ? 'none' : undefined);
+					});
+
+					append($$anchor, th_1);
+				});
+
+				var node_3 = child(tr);
+
+				th(node_3, () => 1);
+
+				var node_4 = sibling(node_3);
+
+				th(node_4, () => 2);
+
+				var node_5 = sibling(node_4);
+
+				th(node_5, () => 3);
+
+				var node_6 = sibling(node_5);
+
+				th(node_6, () => 4);
+
+				var node_7 = sibling(node_6);
+
+				th(node_7, () => 5);
+
+				var node_8 = sibling(node_7);
+
+				th(node_8, () => 6);
+
+				var node_9 = sibling(node_8);
+
+				th(node_9, () => 7);
+				reset(tr);
+			}
+
+			reset(thead);
+
+			var tbody = sibling(thead);
+
+			each(tbody, 21, () => get(days), index, ($$anchor, week) => {
+				var tr_1 = root_3();
+
+				each(tr_1, 21, () => get(week), index, ($$anchor, day) => {
+					var td = root_4();
+					var text_3 = child(td);
+					var node_10 = sibling(text_3);
+
+					{
+						var consequent_1 = ($$anchor) => {
+							var ul = root_5();
+
+							each(ul, 21, () => get(day).events, index, ($$anchor, event) => {
+								var li = root_6();
+
+								const query = derived(() => new URLSearchParams({
+									id: get(event).id,
+									start: get(event).start,
+									title: get(event).title
+								}));
+
+								get(query);
+
+								var a = child(li);
+
+								template_effect(() => set_attribute(a, "href", `${config.calendar_page ?? ""}?${get(query).toString() ?? ""}`));
+
+								var node_11 = child(a);
+
+								{
+									var consequent = ($$anchor) => {
+										var time = root_7();
+										var text_4 = child(time, true);
+
+										template_effect(() => set_text(text_4, dateFormatters.shortTimeFormatter.format(new Date(get(event).start))));
+										reset(time);
+										template_effect(() => set_attribute(time, "datetime", get(event).start));
+										append($$anchor, time);
+									};
+
+									if_block(node_11, ($$render) => {
+										if (!get(event).allDay && get(event).start.includes(get(day).dateString)) $$render(consequent);
+									});
+								}
+
+								var text_5 = sibling(node_11);
+
+								reset(a);
+								reset(li);
+								template_effect(() => set_text(text_5, ` ${get(event).title ?? ""}`));
+								append($$anchor, li);
+							});
+
+							reset(ul);
+							append($$anchor, ul);
+						};
+
+						if_block(node_10, ($$render) => {
+							if (get(day).eventFul) $$render(consequent_1);
+						});
+					}
+
+					reset(td);
+
+					template_effect(() => {
+						set_attribute(td, "aria-disabled", strict_equals(get(day).position, 'out-of-month') ? true : undefined);
+						set_attribute(td, "aria-label", get(day).label);
+						set_attribute(td, "data-day", get(day).dateString);
+						set_attribute(td, "data-position", get(day).position);
+						set_attribute(td, "data-type", get(day).type);
+						set_text(text_3, `${get(day).day ?? ""} `);
+					});
+
+					append($$anchor, td);
+				});
+
+				reset(tr_1);
+				append($$anchor, tr_1);
+			});
+
+			reset(tbody);
+			reset(table);
+			bind_this(table, ($$value) => wrapper = $$value, () => wrapper);
+
+			template_effect(() => {
+				set_attribute(h2, "id", `${id() ?? ""}_title`);
+				set_attribute(table, "id", id());
+				set_attribute(table, "aria-labelledby", `${id() ?? ""}_title`);
+			});
+
+			append($$anchor, fragment);
+		},
+		($$anchor, error) => {
+			var fragment_1 = root_8();
+			var pre = sibling(first_child(fragment_1), 2);
+			var text_6 = child(pre, true);
+
+			reset(pre);
+			template_effect(() => set_text(text_6, get(error)));
+			append($$anchor, fragment_1);
+		}
+	);
+	template_effect(() => set_attribute(div, "aria-busy", get(busy)));
+	append($$anchor, div);
 	return pop({ ...legacy_api() });
 }
 
 mark_module_end(CalendarMonth);
+delegate(["click"]);
 
 new SiteNav();
 const defaultImgs = document.querySelectorAll('.card .card-img.default-img');
@@ -5174,8 +6145,8 @@ if (config.calendar_api_url != null && config.calendar_api_url.trim().length >= 
                 mount(CalendarMonth, {
                     target: element,
                     props: {
-                        year: element.dataset.pprekYear,
-                        month: element.dataset.pprekMonth
+                        year: useIf(element.dataset.pprekYear, it => it != null && it.trim() !== '', parseInt, undefined),
+                        month: useIf(element.dataset.pprekMonth, it => it != null && it.trim() !== '', parseInt, undefined)
                     }
                 });
                 break;

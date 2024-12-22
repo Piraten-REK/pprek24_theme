@@ -24,6 +24,7 @@ export function useIf <T, R, P extends boolean, D = null> (it: T, predicate: (it
 
 interface JsConfig {
   calendar_api_url: string
+  calendar_page: string
 }
 export const config = useIfExists<HTMLScriptElement | null, Partial<JsConfig>>(document.querySelector('#pprek_js_conf'), it => JSON.parse(it.textContent ?? '{}'), {})
 

@@ -1,5 +1,5 @@
 import SiteNav from './inc/SiteNav'
-import { config } from "./lib/utils"
+import { config, useIf } from "./lib/utils"
 
 import { mount } from 'svelte'
 import CalendarNextEvents from '../svelte/CalendarNextEvents.svelte'
@@ -33,8 +33,10 @@ if (config.calendar_api_url != null && config.calendar_api_url.trim().length >= 
                 mount(CalendarMonth, {
                     target: element,
                     props: {
-                        year: element.dataset.pprekYear,
-                        month: element.dataset.pprekMonth
+                        // @ts-expect-error
+                        year: useIf(element.dataset.pprekYear, it => it != null && it.trim() !== '', parseInt, undefined),
+                        // @ts-expect-error
+                        month: useIf(element.dataset.pprekMonth, it => it != null && it.trim() !== '', parseInt, undefined)
                     }
                 })
                 break

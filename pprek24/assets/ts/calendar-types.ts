@@ -16,6 +16,12 @@ namespace Calendar {
     events: Event[]
     max: number
   }
+
+  export interface MonthResponse {
+    year: number
+    month: number
+    events: Event[]
+  }
 }
 
-export default Calendar
+export { type Calendar as default }
