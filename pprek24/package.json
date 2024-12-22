@@ -7,8 +7,8 @@
     "ts": "rollup -c",
     "ts:dev": "rollup -c --config-dev",
     "dev": "rollup -c --config-dev --watch",
-    "sass": "sass assets/styles/sass/:assets/styles/",
-    "sass:watch": "sass assets/styles/sass/:assets/styles/ -w",
+    "sass": "_DIR=\"$PWD/assets\" && if [[ ! -f $_DIR/js/sveltle.css ]]; then touch $_DIR/js/svelte.css; fi; if [[ ! -L $_DIR/styles/sass/_svelte.css ]]; then ln -s $_DIR/js/svelte.css $_DIR/styles/sass/_svelte.css; fi; sass assets/styles/sass/:assets/styles/",
+    "sass:watch": "_DIR=\"$PWD/assets\" && if [[ ! -f $_DIR/js/sveltle.css ]]; then touch $_DIR/js/svelte.css; fi; if [[ ! -L $_DIR/styles/sass/_svelte.css ]]; then ln -s $_DIR/js/svelte.css $_DIR/styles/sass/_svelte.css; fi; sass assets/styles/sass/:assets/styles/ -w",
     "postinstall": "./link_icon_fonts.sh",
     "build": "pnpm run ts; pnpm run sass"
   },
