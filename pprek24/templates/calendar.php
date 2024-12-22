@@ -6,15 +6,16 @@ if (isset($_GET['id'])) {
   } else {
     $type = 'broken_event';
   }
-} elseif (isset($_GET['year']) && isset($_GET['month'])) {
+} else {
   $type = 'month';
 }
 
 get_header();
 
 if ($type == 'month'): ?>
-<h1>Unsere Termine</h1>
-<div data-pprek-calendar="month" data-pprek-year="<?php echo esc_attr($_GET['year']); ?>" data-pprek-month="<?php echo esc_attr($_GET['month']); ?>">PLACEHOLDER</div>
+  <h1>Unsere Termine</h1>
+  <div data-pprek-calendar="month" data-pprek-year="<?php echo esc_attr($_GET['year'] ?? ''); ?>" data-pprek-month="<?php echo esc_attr($_GET['month'] ?? ''); ?>"></div>
 <?php else: ?>
-KALENDER
+  KALENDER
 <?php endif; get_footer(); ?>
+
