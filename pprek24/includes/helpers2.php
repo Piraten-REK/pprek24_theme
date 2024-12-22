@@ -107,7 +107,8 @@ function pprek24_get_day_archive (WP_Post|int|null $post = null): string {
 }
 
 define('PPREK24_JAVASCRIPT_CONFIGURATION', [
-  'calendar_api_url' => pprek24_calendar_api_url()
+  'calendar_api_url'  =>  pprek24_calendar_api_url(),
+  'calendar_page'     =>  pprek24_calendar_page_url('', 'relative')
 ]);
 
 function pprek24_modify_page_title (array $title_parts): array {
