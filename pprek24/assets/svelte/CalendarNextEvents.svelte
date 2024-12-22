@@ -8,6 +8,7 @@
   }
 
   const { id = getRandomId(6, 'calendar-next-events_') }: Props = $props()
+  let busy = $state(true)
   let events: Promise<Calendar.Event[]> = $state(
     fetch(` ${config.calendar_api_url}/next`, { cache: 'default' })
       .then(async res => {
@@ -18,59 +19,62 @@
         return await res.json() as Calendar.NextResponse
       })
       .then(res => res.events)
+      .finally(() => busy = false)
     )
 </script>
 
-{#await events}
-  <Loader />
-{:then events} 
-  <div class='event-list' id={id}>
-    {#each events as event, index}
-      {@const query = new URLSearchParams({ start: event.start, id: event.id, title: event.title })}
-      {@const startDate = new Date(event.start)}
-      {@const endDate = new Date(event.end)}
-      <article
-        class="event"
-        aria-labelledby="{id}_${index}_title"
-        aria-describedby="{id}_{index}_date {id}_{index}_time"
-        aria-posinset={index + 1}
-        aria-setsize={events.length}
-      >
-        <div class="event-title" id="{id}_{index}_title">
-          <a href="/calendar?{query.toString()}">{event.title}</a>
-        </div>
-        <time
-          class="event-date"
-          id="{id}_{index}_date"
-          datetime={event.start.split('T')[0]}
+<div aria-live="off" aria-atomic="true" aria-busy={busy}>
+  {#await events}
+    <Loader />
+  {:then events} 
+    <ul class='event-list' id={id}>
+      {#each events as event, index}
+        {@const query = new URLSearchParams({ start: event.start, id: event.id, title: event.title })}
+        {@const startDate = new Date(event.start)}
+        {@const endDate = new Date(event.end)}
+        <li
+          class="event"
+          aria-labelledby="{id}_${index}_title"
+          aria-describedby="{id}_{index}_date {id}_{index}_time"
+          aria-posinset={index + 1}
+          aria-setsize={events.length}
         >
-          <span>{dateFormatters.twoDigitDayFormatter.format(startDate)}</span>
-          <span>{dateFormatters.shortMonthFormatter.format(startDate)}</span>
-        </time>
-        <span class="event-time" id="{id}_{index}_time">
-          {#if event.allDay && event.start.split('T')[0] === event.end.split('T')[0]}
-            <!-- one day, all day -->
-             ganztägig
-          {:else if event.allDay}
-            <!-- all day -->
-             ganztägig bis <time datetime={event.end}>{dateFormatters.longDateFormatter.format(endDate)}</time>
-          {:else}
-            <time datetime={event.start}>{dateFormatters.shortTimeFormatter.format(startDate)} Uhr</time> bis
-            <time datetime={event.end}>
-              {#if event.start.split('T')[0] !== event.end.split('T')[0]}
-                {dateFormatters.longDateFormatter.format(endDate)}{' '}
-              {/if}
-              {dateFormatters.shortTimeFormatter.format(endDate)} Uhr
-            </time>
-          {/if}
-        </span>
-      </article>
-    {/each}
-  </div>
-{:catch error}
-  <div>Error</div>
-  <pre>{error}</pre>
-{/await}
+          <div class="event-title" id="{id}_{index}_title">
+            <a href="/calendar?{query.toString()}">{event.title}</a>
+          </div>
+          <time
+            class="event-date"
+            id="{id}_{index}_date"
+            datetime={event.start.split('T')[0]}
+          >
+            <span>{dateFormatters.twoDigitDayFormatter.format(startDate)}</span>
+            <span>{dateFormatters.shortMonthFormatter.format(startDate)}</span>
+          </time>
+          <span class="event-time" id="{id}_{index}_time">
+            {#if event.allDay && event.start.split('T')[0] === event.end.split('T')[0]}
+              <!-- one day, all day -->
+              ganztägig
+            {:else if event.allDay}
+              <!-- all day -->
+              ganztägig bis <time datetime={event.end}>{dateFormatters.longDateFormatter.format(endDate)}</time>
+            {:else}
+              <time datetime={event.start}>{dateFormatters.shortTimeFormatter.format(startDate)} Uhr</time> bis
+              <time datetime={event.end}>
+                {#if event.start.split('T')[0] !== event.end.split('T')[0]}
+                  {dateFormatters.longDateFormatter.format(endDate)}{' '}
+                {/if}
+                {dateFormatters.shortTimeFormatter.format(endDate)} Uhr
+              </time>
+            {/if}
+          </span>
+        </li>
+      {/each}
+    </ul>
+  {:catch error}
+    <div>Error</div>
+    <pre>{error}</pre>
+  {/await}
+</div>
 
 <style lang="scss">
   .event-list {
@@ -93,6 +97,7 @@
     isolation: isolate;
     border-radius: .25rem;
     overflow: hidden;
+    list-style-type: none;
   }
 
   .event-date {
