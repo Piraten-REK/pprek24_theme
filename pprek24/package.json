@@ -9,7 +9,8 @@
     "dev": "rollup -c --config-dev --watch",
     "sass": "sass assets/styles/sass/:assets/styles/",
     "sass:watch": "sass assets/styles/sass/:assets/styles/ -w",
-    "postinstall": "./link_icon_fonts.sh"
+    "postinstall": "./link_icon_fonts.sh",
+    "build": "pnpm run ts; pnpm run sass"
   },
   "keywords": [],
   "author": "",

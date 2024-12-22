@@ -60,7 +60,13 @@ jobs:
         run:
           pnpm i && cd pprek24 && pnpm i
 
-      - name: Create Realease
+      - name: Build
+        if: env.tag_valid == 'true'
+        shell: bash
+        run:
+          pnpm run build
+
+      - name: Create Release
         if: env.tag_valid == 'true'
         shell: bash
         env:
