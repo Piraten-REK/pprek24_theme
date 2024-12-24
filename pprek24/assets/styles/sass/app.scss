@@ -106,6 +106,7 @@ body {
 main {
   flex: 1 0 auto;
   padding-block: min(calc(var(--site-padding-inline) * 1.25), 2rem);
+  row-gap: 5rem;
 
   --_padding-inline: var(--outer-padding-inline);
 }
