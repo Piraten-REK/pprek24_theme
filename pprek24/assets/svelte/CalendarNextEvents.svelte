@@ -40,7 +40,7 @@
           aria-setsize={events.length}
         >
           <div class="event-title" id="{id}_{index}_title">
-            <a href="/calendar?{query.toString()}">{event.title}</a>
+            <a href="{config.calendar_page}?{query.toString()}">{event.title}</a>
           </div>
           <time
             class="event-date"
@@ -78,8 +78,9 @@
 
 <style lang="scss">
   .event-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: auto;
+    grid-auto-rows: auto;
     gap: 1.5rem;
   }
 
@@ -122,6 +123,9 @@
     grid-area: title;
     padding-inline: .75rem;
     align-self: end;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     a {
       color: inherit;

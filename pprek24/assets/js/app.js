@@ -5493,7 +5493,7 @@ CalendarNextEvents[FILENAME] = "assets/svelte/CalendarNextEvents.svelte";
 var root_5$1 = add_locations(template(`ganztägig bis <time> </time>`, 1), CalendarNextEvents[FILENAME], [[59, 28]]);
 var root_6$1 = add_locations(template(`<time> </time> bis <time><!> </time>`, 1), CalendarNextEvents[FILENAME], [[61, 14], [62, 14]]);
 
-var root_2$1 = add_locations(template(`<li class="event svelte-guwymb"><div class="event-title svelte-guwymb"><a class="svelte-guwymb"> </a></div> <time class="event-date svelte-guwymb"><span class="svelte-guwymb"> </span> <span class="svelte-guwymb"> </span></time> <span class="event-time svelte-guwymb"><!></span></li>`), CalendarNextEvents[FILENAME], [
+var root_2$1 = add_locations(template(`<li class="event svelte-pe9ggo"><div class="event-title svelte-pe9ggo"><a class="svelte-pe9ggo"> </a></div> <time class="event-date svelte-pe9ggo"><span class="svelte-pe9ggo"> </span> <span class="svelte-pe9ggo"> </span></time> <span class="event-time svelte-pe9ggo"><!></span></li>`), CalendarNextEvents[FILENAME], [
 	[
 		35,
 		8,
@@ -5505,7 +5505,7 @@ var root_2$1 = add_locations(template(`<li class="event svelte-guwymb"><div clas
 	]
 ]);
 
-var root_1$1 = add_locations(template(`<ul class="event-list svelte-guwymb"></ul>`), CalendarNextEvents[FILENAME], [[30, 4]]);
+var root_1$1 = add_locations(template(`<ul class="event-list svelte-pe9ggo"></ul>`), CalendarNextEvents[FILENAME], [[30, 4]]);
 var root_8$1 = add_locations(template(`<div>Error</div> <pre> </pre>`, 1), CalendarNextEvents[FILENAME], [[74, 4], [75, 4]]);
 var root$2 = add_locations(template(`<div aria-live="off" aria-atomic="true"><!></div>`), CalendarNextEvents[FILENAME], [[26, 0]]);
 
@@ -5560,7 +5560,7 @@ function CalendarNextEvents($$anchor, $$props) {
 				var div_1 = child(li);
 				var a = child(div_1);
 
-				template_effect(() => set_attribute(a, "href", `/calendar?${get(query).toString() ?? ""}`));
+				template_effect(() => set_attribute(a, "href", `${config.calendar_page ?? ""}?${get(query).toString() ?? ""}`));
 
 				var text$1 = child(a, true);
 
