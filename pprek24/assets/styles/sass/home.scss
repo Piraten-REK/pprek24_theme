@@ -1,0 +1,27 @@
+body.home {
+  main > section > h1 {
+    margin-block-end: 1.5rem;
+  }
+
+  :has(> ul.event-list) {
+    container: event-list / inline-size;
+  }
+
+  .event-list {
+    justify-content: center;
+    grid-template-columns: min(100%, 22rem);
+  }
+
+  $_min-width: 20rem;
+  $_max-width: 22rem;
+  $_gap: 1.5rem;
+
+  @for $factor from 1 through 2 {
+    $one_more: $factor + 1;
+    @container event-list (width > #{$one_more * $_min-width + $factor * $_gap}) {
+      .event-list {
+        grid-template-columns: repeat(#{$one_more}, min(calc((100% - #{$_gap * $factor}) / #{$one_more}), #{$_max-width}));
+      }
+    }
+  }
+}
