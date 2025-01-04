@@ -5,10 +5,11 @@ function pprek24_enqueue (): callable {
   $ver = PPREK_DEV_MODE ? time(): false;
 
   $styles = [
-    'main'  =>  '/assets/styles/app.css',
-    'print' =>  ['/assets/styles/print.css', 'media' => 'print'],
-    '404'   =>  ['/assets/styles/404.css', 'condition' => fn () => is_404()],
-    'home'  =>  ['/assets/styles/home.css', 'condition' => fn () => is_front_page()],
+    'main'    =>  '/assets/styles/app.css',
+    'print'   =>  ['/assets/styles/print.css', 'media' => 'print'],
+    '404'     =>  ['/assets/styles/404.css', 'condition' => fn () => is_404()],
+    'home'    =>  ['/assets/styles/home.css', 'condition' => fn () => is_front_page()],
+    'single'  =>  ['/assets/styles/single.css', 'condition' => fn () => is_single()],
   ];
   $scripts = [
     'main_js' =>  '/assets/js/app.js'
