@@ -100,3 +100,22 @@ function pprek24_enqueue (): callable {
     }
   };
 }
+
+function pprek24_enqueue_gutenberg_assets() {
+  $asset_path = '/assets/js/gutenberg/sidebar.js';
+
+  wp_enqueue_script(
+    'pprek24_gutenberg',
+    get_theme_file_uri($asset_path),
+    [
+      'wp-plugins',
+      'wp-edit-post',
+      'wp-components',
+      'wp-data',
+      'wp-i18n',
+      'wp-element'
+    ],
+    filemtime(get_theme_file_path($asset_path)),
+    true
+  );
+}
