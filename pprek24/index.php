@@ -1,3 +1,6 @@
 <?php get_header(); ?>
-<p>Hello world</p>
+<h1><?php the_title(); ?></h1>
+<section class="content">
+  <?php the_content(); ?>
+</section>
 <?php get_footer(); ?>
