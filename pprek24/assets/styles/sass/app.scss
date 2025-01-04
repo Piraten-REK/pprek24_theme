@@ -180,6 +180,11 @@ main {
   }
 }
 
+.sr-only-modified {
+  @extend .sr-only;
+  width: auto !important;
+}
+
 :where(button) {
   appearance: none;
   font: inherit;
