@@ -1,21 +1,15 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "module": "esnext",
     "lib": ["DOM", "ES2022"],
+    "jsx": "preserve",
     "moduleResolution": "node",
-    "outDir": "./assets/js/gutenberg",
-    "removeComments": true,
-    "newLine": "lf",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
     "skipLibCheck": true,
-    "jsx": "react-jsx",
-    "module": "esnext"
+    "outDir": "./assets/js/gutenberg"
   },
   "include": ["assets/ts/gutenberg/**/*"]
 }

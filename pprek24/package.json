@@ -10,7 +10,9 @@
     "sass": "_DIR=\"$PWD/assets\" && if [[ ! -f $_DIR/js/sveltle.css ]]; then touch $_DIR/js/svelte.css; fi; if [[ ! -L $_DIR/styles/sass/_svelte.css ]]; then ln -s $_DIR/js/svelte.css $_DIR/styles/sass/_svelte.css; fi; sass assets/styles/sass/:assets/styles/",
     "sass:watch": "_DIR=\"$PWD/assets\" && if [[ ! -f $_DIR/js/sveltle.css ]]; then touch $_DIR/js/svelte.css; fi; if [[ ! -L $_DIR/styles/sass/_svelte.css ]]; then ln -s $_DIR/js/svelte.css $_DIR/styles/sass/_svelte.css; fi; sass assets/styles/sass/:assets/styles/ -w",
     "postinstall": "./link_icon_fonts.sh",
-    "build": "pnpm run ts; pnpm run sass"
+    "build": "pnpm run ts; pnpm run sass",
+    "build:gutenberg": "wp-scripts build assets/ts/gutenberg/*.tsx --output-path=assets/js/gutenberg",
+    "dev:gutenberg": "wp-scripts start assets/ts/gutenberg/*.tsx --output-path=assets/js/gutenberg"
   },
   "keywords": [],
   "author": "",
@@ -23,10 +25,10 @@
     "@types/wordpress__edit-post": "^8.4.2",
     "@wordpress/components": "^29.1.1",
     "@wordpress/data": "^10.15.1",
-    "@wordpress/edit-post": "^8.15.1",
-    "@wordpress/element": "^6.15.1",
+    "@wordpress/editor": "^14.15.1",
     "@wordpress/i18n": "^5.15.1",
     "@wordpress/plugins": "^7.15.1",
+    "@wordpress/scripts": "^30.8.1",
     "rollup": "^4.13.0",
     "rollup-plugin-css-only": "^4.5.2",
     "rollup-plugin-svelte": "^7.2.2",

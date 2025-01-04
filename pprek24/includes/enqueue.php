@@ -101,21 +101,23 @@ function pprek24_enqueue (): callable {
   };
 }
 
-function pprek24_enqueue_gutenberg_assets() {
-  $asset_path = '/assets/js/gutenberg/document-panel.js';
+function pprek24_enqueue_gutenberg_assets(): void {
+  $assets_directory = get_theme_file_path('/assets/js/gutenberg');
 
-  wp_enqueue_script(
-    'pprek24_gutenberg',
-    get_theme_file_uri($asset_path),
-    [
-      'wp-plugins',
-      'wp-edit-post',
-      'wp-components',
-      'wp-data',
-      'wp-i18n',
-      'wp-element'
-    ],
-    filemtime(get_theme_file_path($asset_path)),
-    true
-  );
+  foreach (new DirectoryIterator($assets_directory) as $file) {
+    if ($file->isDot() || !str_ends_with($file->getFilename(), '.asset.php')) {
+      continue;
+    }
+
+    $name = substr($file->getFilename(), 0, -10);
+    $asset = require($file->getPathname());
+
+    wp_enqueue_script(
+      "pprek24_gutenberg_$name",
+      get_theme_file_uri("/assets/js/gutenberg/$name.js"),
+      $asset['dependencies'],
+      $asset['version'],
+      true
+    );
+  }
 }

@@ -7,20 +7,6 @@ import css from 'rollup-plugin-css-only'
 
 const dev = process.argv.includes('--config-dev')
 
-const wp_externals = {
-  '@wordpress/blocks': 'wp.blocks',
-  '@wordpress/components': 'wp.components',
-  '@wordpress/compose': 'wp.compose',
-  '@wordpress/core-data': 'wp.coreData',
-  '@wordpress/data': 'wp.data',
-  '@wordpress/edit-post': 'wp.editPost',
-  '@wordpress/element': 'wp.element',
-  '@wordpress/i18n': 'wp.i18n',
-  '@wordpress/plugins': 'wp.plugins',
-  'react': 'React',
-  'react-dom': 'ReactDOM'
-}
-
 export default [
   {
     input: './assets/ts/app.ts',
@@ -51,29 +37,6 @@ export default [
         include: ['assets/**/*.ts'],
         resolveJsonModule: true,
         moduleResolution: 'node'
-      }),
-      !dev ? terser() : null
-    ].filter(Boolean)
-  },
-  {
-    input: './assets/ts/gutenberg/document-panel.ts',
-    output: {
-      dir: './assets/js/gutenberg',
-      format: 'iife',
-      name: 'PPREKGutenberg',
-      globals: wp_externals,
-      sourcemap: dev
-    },
-    external: Object.keys(wp_externals),
-    plugins: [
-      nodeResolve({
-        browser: true,
-        preferBuiltins: false,
-        extensions: ['.js', '.ts', '.json']
-      }),
-      typescript({
-        tsconfig: './tsconfig.gutenberg.json',
-        sourceMap: dev
       }),
       !dev ? terser() : null
     ].filter(Boolean)
