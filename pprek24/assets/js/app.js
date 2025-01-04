@@ -5745,38 +5745,46 @@ mark_module_end(Icon);
 mark_module_start();
 CalendarMonth[FILENAME] = "assets/svelte/CalendarMonth.svelte";
 
-var root_2 = add_locations(template(`<th class="svelte-pb28ll"><span class="pprek-calendar-weekday--long"> </span> <span class="pprek-calendar-weekday--short" aria-hidden="true"> </span></th>`), CalendarMonth[FILENAME], [
+var root_2 = add_locations(template(`<th class="svelte-1nqudi3"><span class="pprek-calendar-weekday--long"> </span> <span class="pprek-calendar-weekday--short" aria-hidden="true"> </span></th>`), CalendarMonth[FILENAME], [
 	[
-		153,
+		192,
 		12,
-		[[154, 14], [155, 14]]
+		[[193, 14], [198, 14]]
 	]
 ]);
 
-var root_7 = add_locations(template(`<time class="svelte-pb28ll"> </time>`), CalendarMonth[FILENAME], [[187, 26]]);
-var root_6 = add_locations(template(`<li class="svelte-pb28ll"><a class="svelte-pb28ll"><!> </a></li>`), CalendarMonth[FILENAME], [[184, 22, [[185, 24]]]]);
-var root_5 = add_locations(template(`<ul class="svelte-pb28ll"></ul>`), CalendarMonth[FILENAME], [[181, 18]]);
-var root_4 = add_locations(template(`<td role="gridcell" class="svelte-pb28ll"> <!></td>`), CalendarMonth[FILENAME], [[171, 14]]);
-var root_3 = add_locations(template(`<tr class="svelte-pb28ll"></tr>`), CalendarMonth[FILENAME], [[169, 10]]);
+var root_7 = add_locations(template(`<time class="svelte-1nqudi3"> </time>`), CalendarMonth[FILENAME], [[241, 28]]);
 
-var root_1 = add_locations(template(`<header class="pprek-calendar-month-title svelte-pb28ll"><button class="pprek-calendar-month-prev svelte-pb28ll"><!></button> <h2 class="svelte-pb28ll"> </h2> <button class="pprek-calendar-month-next svelte-pb28ll"><!></button></header> <table class="pprek-calendar-month svelte-pb28ll" role="grid"><thead aria-hidden="true" class="svelte-pb28ll"><tr class="svelte-pb28ll"><!><!><!><!><!><!><!></tr></thead><tbody class="svelte-pb28ll"></tbody></table>`, 1), CalendarMonth[FILENAME], [
+var root_6 = add_locations(template(`<li class="svelte-1nqudi3"><a class="svelte-1nqudi3"><!> <span class="event-title svelte-1nqudi3"> </span></a></li>`), CalendarMonth[FILENAME], [
 	[
-		143,
+		238,
+		22,
+		[[239, 24, [[247, 26]]]]
+	]
+]);
+
+var root_5 = add_locations(template(`<ul class="svelte-1nqudi3"></ul>`), CalendarMonth[FILENAME], [[231, 18]]);
+var root_4 = add_locations(template(`<td role="gridcell" class="svelte-1nqudi3"> <!></td>`), CalendarMonth[FILENAME], [[219, 14]]);
+var root_3 = add_locations(template(`<tr class="svelte-1nqudi3"></tr>`), CalendarMonth[FILENAME], [[217, 10]]);
+
+var root_1 = add_locations(template(`<header class="pprek-calendar-month-title svelte-1nqudi3"><button class="pprek-calendar-month-prev svelte-1nqudi3"><!></button> <h2 class="svelte-1nqudi3"> </h2> <button class="pprek-calendar-month-next svelte-1nqudi3"><!></button></header> <table class="pprek-calendar-month svelte-1nqudi3" role="grid"><thead aria-hidden="true" class="svelte-1nqudi3"><tr class="svelte-1nqudi3"><!><!><!><!><!><!><!></tr></thead><tbody class="svelte-1nqudi3"></tbody></table>`, 1), CalendarMonth[FILENAME], [
+	[
+		168,
 		4,
-		[[144, 6], [145, 6], [146, 6]]
+		[[169, 6], [172, 6], [177, 6]]
 	],
 	[
-		148,
+		181,
 		4,
 		[
-			[149, 6, [[150, 8]]],
-			[167, 6]
+			[188, 6, [[189, 8]]],
+			[215, 6]
 		]
 	]
 ]);
 
-var root_8 = add_locations(template(`<div>Error</div> <pre> </pre>`, 1), CalendarMonth[FILENAME], [[202, 4], [203, 4]]);
-var root = add_locations(template(`<div aria-live="off" aria-atomic="true"><!></div>`), CalendarMonth[FILENAME], [[139, 0]]);
+var root_8 = add_locations(template(`<div>Error</div> <pre> </pre>`, 1), CalendarMonth[FILENAME], [[260, 4], [261, 4]]);
+var root = add_locations(template(`<div aria-live="off" aria-atomic="true"><!></div>`), CalendarMonth[FILENAME], [[164, 0]]);
 
 function CalendarMonth($$anchor, $$props) {
 	check_target(new.target);
@@ -5784,11 +5792,30 @@ function CalendarMonth($$anchor, $$props) {
 	validate_prop_bindings($$props, [], [], CalendarMonth);
 
 	const now = new Date();
-	const id = prop($$props, "id", 19, () => getRandomId(6, 'calendar-next-events_'));
+	const id = prop($$props, "id", 19, () => getRandomId(6, "calendar-next-events_"));
 	let year = state(proxy($$props.year ?? now.getFullYear()));
 	let month = state(proxy($$props.month ?? now.getMonth() + 1));
-	let wrapper;
+	let wrapper = state(undefined);
 	let longTitles = state(true);
+
+	const onResize = derived(() => (entries) => {
+		entryLoop: for (const entry of entries) {
+			const headerCells = Array.from(entry.target.querySelectorAll("thead tr th"));
+			const padding = getComputedStyle(headerCells[0]).paddingInline.split(" ").reduce((acc, cur) => acc + parseFloat(cur), 0);
+			const maxWidth = headerCells[0].getBoundingClientRect().width - padding;
+
+			for (const cell of headerCells) {
+				const longText = cell.querySelector(".pprek-calendar-weekday--long");
+
+				if (maxWidth < longText.getBoundingClientRect().width) {
+					set(longTitles, false);
+					continue entryLoop;
+				}
+			}
+
+			set(longTitles, true);
+		}
+	});
 
 	const prev = () => {
 		update(month, -1);
@@ -5798,7 +5825,7 @@ function CalendarMonth($$anchor, $$props) {
 			update(year, -1);
 		}
 
-		const url = window.location.href.split('?')[0];
+		const url = window.location.href.split("?")[0];
 
 		const query = new URLSearchParams({
 			year: get(year).toString(),
@@ -5810,7 +5837,7 @@ function CalendarMonth($$anchor, $$props) {
 				year: get(year),
 				month: get(month)
 			},
-			'',
+			"",
 			`${url}?${query}`
 		);
 	};
@@ -5823,7 +5850,7 @@ function CalendarMonth($$anchor, $$props) {
 			update(year);
 		}
 
-		const url = window.location.href.split('?')[0];
+		const url = window.location.href.split("?")[0];
 
 		const query = new URLSearchParams({
 			year: get(year).toString(),
@@ -5835,7 +5862,7 @@ function CalendarMonth($$anchor, $$props) {
 				year: get(year),
 				month: get(month)
 			},
-			'',
+			"",
 			`${url}?${query}`
 		);
 	};
@@ -5851,8 +5878,8 @@ function CalendarMonth($$anchor, $$props) {
 
 	let busy = state(true);
 
-	let req = derived(() => fetch(` ${config.calendar_api_url}/${get(year)}/${get(month)}`, { cache: 'default' }).then(async (res) => {
-		if (strict_equals(res.status, 200, false) && strict_equals(res.status, 304, false) && strict_equals(res.headers.get('X-API-Version'), '2', false)) {
+	let req = derived(() => fetch(` ${config.calendar_api_url}/${get(year)}/${get(month)}`, { cache: "default" }).then(async (res) => {
+		if (strict_equals(res.status, 200, false) && strict_equals(res.status, 304, false) && strict_equals(res.headers.get("X-API-Version"), "2", false)) {
 			throw new Error(await res.json());
 		}
 
@@ -5871,8 +5898,8 @@ function CalendarMonth($$anchor, $$props) {
 					label: dateFormatters.longDateFormatter.format(date),
 					events,
 					eventFul: events.length > 0,
-					type: events.length > 0 ? 'eventful' : 'eventless',
-					position: strict_equals(date.getMonth() + 1, get(month)) ? 'in-month' : 'out-of-month'
+					type: events.length > 0 ? "eventful" : "eventless",
+					position: strict_equals(date.getMonth() + 1, get(month)) ? "in-month" : "out-of-month"
 				};
 
 				date.setHours(24);
@@ -5883,24 +5910,14 @@ function CalendarMonth($$anchor, $$props) {
 	}).finally(() => set(busy, false)));
 
 	user_effect(() => {
-		if (strict_equals(wrapper, undefined)) {
+		if (strict_equals(get(wrapper), undefined)) {
 			return;
 		}
 
-		const headerCells = Array.from(wrapper.querySelectorAll('thead tr th'));
-		const padding = getComputedStyle(headerCells[0]).paddingInline.split(' ').reduce((acc, cur) => acc + parseInt(cur), 0);
-		const maxWidth = headerCells[0].getBoundingClientRect().width - padding;
+		const observer = new ResizeObserver(get(onResize));
 
-		for (const cell of headerCells) {
-			const longText = cell.querySelector('.pprek-calendar-weekday--long');
-
-			if (maxWidth < longText.getBoundingClientRect().width) {
-				set(longTitles, false);
-				return;
-			}
-		}
-
-		set(longTitles, true);
+		observer.observe(get(wrapper));
+		return () => observer.disconnect();
 	});
 
 	var div = root();
@@ -5972,8 +5989,8 @@ function CalendarMonth($$anchor, $$props) {
 					reset(th_1);
 
 					template_effect(() => {
-						toggle_class(span, "sr-only", !get(longTitles));
-						set_style(span_1, "display", get(longTitles) ? 'none' : undefined);
+						toggle_class(span, "sr-only-modified", !get(longTitles));
+						set_style(span_1, "display", get(longTitles) ? "none" : undefined);
 					});
 
 					append($$anchor, th_1);
@@ -6058,11 +6075,13 @@ function CalendarMonth($$anchor, $$props) {
 									});
 								}
 
-								var text_5 = sibling(node_11);
+								var span_2 = sibling(node_11, 2);
+								var text_5 = child(span_2, true);
 
+								reset(span_2);
 								reset(a);
 								reset(li);
-								template_effect(() => set_text(text_5, ` ${get(event).title ?? ""}`));
+								template_effect(() => set_text(text_5, get(event).title));
 								append($$anchor, li);
 							});
 
@@ -6078,7 +6097,7 @@ function CalendarMonth($$anchor, $$props) {
 					reset(td);
 
 					template_effect(() => {
-						set_attribute(td, "aria-disabled", strict_equals(get(day).position, 'out-of-month') ? true : undefined);
+						set_attribute(td, "aria-disabled", strict_equals(get(day).position, "out-of-month") ? true : undefined);
 						set_attribute(td, "aria-label", get(day).label);
 						set_attribute(td, "data-day", get(day).dateString);
 						set_attribute(td, "data-position", get(day).position);
@@ -6095,7 +6114,7 @@ function CalendarMonth($$anchor, $$props) {
 
 			reset(tbody);
 			reset(table);
-			bind_this(table, ($$value) => wrapper = $$value, () => wrapper);
+			bind_this(table, ($$value) => set(wrapper, $$value), () => get(wrapper));
 
 			template_effect(() => {
 				set_attribute(h2, "id", `${id() ?? ""}_title`);
