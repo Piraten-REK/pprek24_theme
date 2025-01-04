@@ -102,7 +102,7 @@ function pprek24_enqueue (): callable {
 }
 
 function pprek24_enqueue_gutenberg_assets() {
-  $asset_path = '/assets/js/gutenberg/sidebar.js';
+  $asset_path = '/assets/js/gutenberg/document-panel.js';
 
   wp_enqueue_script(
     'pprek24_gutenberg',

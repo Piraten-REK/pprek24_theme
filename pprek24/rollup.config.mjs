@@ -56,7 +56,7 @@ export default [
     ].filter(Boolean)
   },
   {
-    input: './assets/ts/gutenberg/sidebar.ts',
+    input: './assets/ts/gutenberg/document-panel.ts',
     output: {
       dir: './assets/js/gutenberg',
       format: 'iife',
