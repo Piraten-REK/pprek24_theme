@@ -32,9 +32,9 @@ export default [
         output: 'svelte.css'
       }),
       typescript({
-        tsconfig: './tsconfig.json',
+        tsconfig: './assets/ts/tsconfig.json',
         sourceMap: dev,
-        include: ['assets/**/*.ts'],
+        include: ['./**/*.ts'],
         resolveJsonModule: true,
         moduleResolution: 'node'
       }),

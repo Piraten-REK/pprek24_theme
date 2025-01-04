@@ -10,9 +10,9 @@
     "sass": "_DIR=\"$PWD/assets\" && if [[ ! -f $_DIR/js/sveltle.css ]]; then touch $_DIR/js/svelte.css; fi; if [[ ! -L $_DIR/styles/sass/_svelte.css ]]; then ln -s $_DIR/js/svelte.css $_DIR/styles/sass/_svelte.css; fi; sass assets/styles/sass/:assets/styles/",
     "sass:watch": "_DIR=\"$PWD/assets\" && if [[ ! -f $_DIR/js/sveltle.css ]]; then touch $_DIR/js/svelte.css; fi; if [[ ! -L $_DIR/styles/sass/_svelte.css ]]; then ln -s $_DIR/js/svelte.css $_DIR/styles/sass/_svelte.css; fi; sass assets/styles/sass/:assets/styles/ -w",
     "postinstall": "./link_icon_fonts.sh",
-    "build": "pnpm run ts; pnpm run sass",
-    "build:gutenberg": "wp-scripts build assets/ts/gutenberg/*.tsx --output-path=assets/js/gutenberg",
-    "dev:gutenberg": "wp-scripts start assets/ts/gutenberg/*.tsx --output-path=assets/js/gutenberg"
+    "build": "pnpm run ts; pnpm run sass; pnpm run build:gutenberg",
+    "build:gutenberg": "wp-scripts build assets/gutenberg/*.tsx --output-path=assets/js/gutenberg",
+    "dev:gutenberg": "wp-scripts start assets/gutenberg/*.tsx --output-path=assets/js/gutenberg"
   },
   "keywords": [],
   "author": "",

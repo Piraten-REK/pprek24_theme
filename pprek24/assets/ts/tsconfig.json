@@ -3,7 +3,7 @@
     "target": "ES2022",
     "lib": ["DOM", "ES5", "ES2015", "ES2016", "ESNext"],
     "moduleResolution": "node",
-    "outDir": "./assets/js",
+    "outDir": "../js",
     "removeComments": true,
     "newLine": "lf",
     "allowSyntheticDefaultImports": true,
@@ -14,8 +14,9 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "skipLibCheck": true,
-    "types": ["svelte"]
+    "types": ["svelte"],
+    "verbatimModuleSyntax": true
   },
-  "include": ["assets/ts/**/*", "assets/ts/**/*.ts", "assets/svelte/**/*", "assets/svelte/**/*.svelte"],
+  "include": ["./**/*", "./**/*.ts", "../svelte/**/*", "../svelte/**/*.svelte"],
   "extends": "@tsconfig/svelte/tsconfig.json"
 }
