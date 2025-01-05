@@ -61,12 +61,18 @@ devDependencies:
   '@wordpress/editor':
     specifier: ^14.15.1
     version: 14.15.1(@types/react@18.3.18)(react-dom@18.3.1)(react@18.3.1)
+  '@wordpress/element':
+    specifier: ^6.15.1
+    version: 6.15.1
   '@wordpress/hooks':
     specifier: ^4.15.0
     version: 4.15.0
   '@wordpress/i18n':
     specifier: ^5.15.1
     version: 5.15.1
+  '@wordpress/icons':
+    specifier: ^10.15.1
+    version: 10.15.1(react@18.3.1)
   '@wordpress/plugins':
     specifier: ^7.15.1
     version: 7.15.1(@types/react@18.3.18)(react-dom@18.3.1)(react@18.3.1)
