@@ -34,6 +34,6 @@
       </ul>
     </div>
   </footer>
-  <?php if(has_post_thumbnail()): ?><img class="card-img" src="<?php the_post_thumbnail_url(); ?>" alt="<?php the_post_thumbnail_caption(); ?>" aria-hidden="true">
+  <?php if(has_post_thumbnail()): ?><img class="card-img" src="<?php the_post_thumbnail_url(); ?>" alt="<?php the_post_thumbnail_caption(); ?>" aria-hidden="true" style="<?php echo pprek24_get_post_thumbnail_meta_css(3 / 2); ?>">
   <?php else: ?><div role="img" aria-hidden="true" class="card-img default-img"></div><?php endif; ?>
 </article>
