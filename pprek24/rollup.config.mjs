@@ -5,10 +5,7 @@ import svelte from 'rollup-plugin-svelte'
 import { sveltePreprocess } from 'svelte-preprocess'
 import css from 'rollup-plugin-css-only'
 
-/** @type {string[]} */
-const args = process.argv
-
-const dev = args.includes('--config-dev')
+const dev = process.argv.includes('--config-dev')
 
 export default [
   {
@@ -28,16 +25,16 @@ export default [
         compilerOptions: {
           dev
         },
-        proprocess: sveltePreprocess(),
+        preprocess: sveltePreprocess(),
         emitCss: true
       }),
       css({
         output: 'svelte.css'
       }),
       typescript({
-        tsconfig: './tsconfig.json',
+        tsconfig: './assets/ts/tsconfig.json',
         sourceMap: dev,
-        include: ['assets/**/*.ts'],
+        include: ['./**/*.ts'],
         resolveJsonModule: true,
         moduleResolution: 'node'
       }),

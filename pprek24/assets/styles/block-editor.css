@@ -1,0 +1,35 @@
+.pprek24-feature-image-focus-img {
+  position: relative;
+  isolation: isolate;
+  cursor: crosshair;
+  max-inline-size: 100%;
+}
+.pprek24-feature-image-focus-thumb {
+  --size: 2.5rem;
+  block-size: var(--size);
+  inline-size: var(--size);
+  cursor: grab;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5333333333);
+  backdrop-filter: blur(5px);
+  border: 2px solid #fff;
+  position: absolute;
+  top: var(--y-axis, 50%);
+  left: var(--x-axis, 50%);
+  translate: -50% -50%;
+}
+.pprek24-feature-image-focus-thumb:active {
+  cursor: grabbing;
+}
+.pprek24-feature-image-focus-footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.pprek24-feature-image-focus-actions {
+  display: flex;
+  gap: 8px;
+  flex-direction: row-reverse;
+}
+
+/*# sourceMappingURL=block-editor.css.map */

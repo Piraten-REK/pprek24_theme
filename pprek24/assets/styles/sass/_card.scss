@@ -24,10 +24,10 @@
 
   .card-img {
     inline-size: 100%;
-    aspect-ratio: 3/2;
+    aspect-ratio: 3 / 2; // KEEP IN SYNC WITH PHP!
     display: block;
     object-fit: cover;
-    object-position: var(--_object-fit, center center);
+    object-position: var(--_pos-x, 50%) var(--_pos-y, 50%);
     border-end-start-radius: var(--_border-radius);
     border-end-end-radius: var(--_border-radius);
 

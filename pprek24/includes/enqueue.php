@@ -2,7 +2,7 @@
 
 function pprek24_enqueue (): callable {
   $uri = get_theme_file_uri();
-  $ver = PPREK_DEV_MODE ? time(): false;
+  $ver = PPREK_DEV_MODE ? time() : false;
 
   $styles = [
     'main'    =>  '/assets/styles/app.css',
@@ -99,4 +99,34 @@ function pprek24_enqueue (): callable {
       wp_enqueue_script("pprek24_$handle");
     }
   };
+}
+
+function pprek24_enqueue_gutenberg_assets(): void {
+  $ver = PPREK_DEV_MODE ? time() : false;
+
+  wp_enqueue_style(
+    'pprek24-block-editor-styles',
+    get_theme_file_uri('/assets/styles/block-editor.css'),
+    [],
+    $ver
+  );
+
+  $assets_directory = get_theme_file_path('/assets/js/gutenberg');
+
+  foreach (new DirectoryIterator($assets_directory) as $file) {
+    if ($file->isDot() || !str_ends_with($file->getFilename(), '.asset.php')) {
+      continue;
+    }
+
+    $name = substr($file->getFilename(), 0, -10);
+    $asset = require($file->getPathname());
+
+    wp_enqueue_script(
+      "pprek24_gutenberg_$name",
+      get_theme_file_uri("/assets/js/gutenberg/$name.js"),
+      $asset['dependencies'],
+      $asset['version'],
+      true
+    );
+  }
 }

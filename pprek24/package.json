@@ -10,7 +10,9 @@
     "sass": "_DIR=\"$PWD/assets\" && if [[ ! -f $_DIR/js/sveltle.css ]]; then touch $_DIR/js/svelte.css; fi; if [[ ! -L $_DIR/styles/sass/_svelte.css ]]; then ln -s $_DIR/js/svelte.css $_DIR/styles/sass/_svelte.css; fi; sass assets/styles/sass/:assets/styles/",
     "sass:watch": "_DIR=\"$PWD/assets\" && if [[ ! -f $_DIR/js/sveltle.css ]]; then touch $_DIR/js/svelte.css; fi; if [[ ! -L $_DIR/styles/sass/_svelte.css ]]; then ln -s $_DIR/js/svelte.css $_DIR/styles/sass/_svelte.css; fi; sass assets/styles/sass/:assets/styles/ -w",
     "postinstall": "./link_icon_fonts.sh",
-    "build": "pnpm run ts; pnpm run sass"
+    "build": "pnpm run ts; pnpm run sass; pnpm run build:gutenberg",
+    "build:gutenberg": "wp-scripts build assets/gutenberg/*.tsx --output-path=assets/js/gutenberg",
+    "dev:gutenberg": "wp-scripts start assets/gutenberg/*.tsx --output-path=assets/js/gutenberg"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +22,21 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "@tsconfig/svelte": "^5.0.4",
+    "@types/react": "^18.0.0",
+    "@types/wordpress__block-editor": "^11.5.16",
+    "@types/wordpress__edit-post": "^8.4.2",
+    "@wordpress/block-editor": "^14.10.1",
+    "@wordpress/components": "^29.1.1",
+    "@wordpress/compose": "^7.15.1",
+    "@wordpress/data": "^10.15.1",
+    "@wordpress/dom-ready": "^4.15.0",
+    "@wordpress/editor": "^14.15.1",
+    "@wordpress/element": "^6.15.1",
+    "@wordpress/hooks": "^4.15.0",
+    "@wordpress/i18n": "^5.15.1",
+    "@wordpress/icons": "^10.15.1",
+    "@wordpress/plugins": "^7.15.1",
+    "@wordpress/scripts": "^30.8.1",
     "rollup": "^4.13.0",
     "rollup-plugin-css-only": "^4.5.2",
     "rollup-plugin-svelte": "^7.2.2",
@@ -33,6 +50,10 @@
   "dependencies": {
     "bootstrap-icons": "^1.11.3",
     "dom-helpers": "^5.2.1"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "pnpm": {
     "overrides": {

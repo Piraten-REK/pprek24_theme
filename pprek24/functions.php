@@ -26,6 +26,7 @@ add_action('after_setup_theme', 'pprek24_setup_theme');
 add_action('customize_register', 'pprek24_customize_register');
 add_action('wp_enqueue_scripts', pprek24_enqueue());
 add_action('template_redirect', 'pprek24_template_redirect');
+add_action('enqueue_block_editor_assets', 'pprek24_enqueue_gutenberg_assets');
 
 add_filter('query_vars', 'pprek24_custom_query_vars');
 add_filter('document_title_parts', 'pprek24_modify_page_title', 10, 1);
