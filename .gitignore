@@ -2,5 +2,12 @@ db/
 wp/
 
 pprek24/assets/fonts/.gitignore
+
+pprek24/assets/js/*
+!pprek24/assets/js/.gitkeep
+
+pprek24/assets/styles/*.css
+pprek24/assets/styles/*.css.map
+
 node_modules/
 dist/
