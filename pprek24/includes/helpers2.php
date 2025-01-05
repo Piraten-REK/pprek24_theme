@@ -122,3 +122,50 @@ function pprek24_modify_page_title (array $title_parts): array {
 
   return $title_parts;
 }
+
+/**
+ * @param float $container_aspect
+ * @param int|null $post_id
+ * @return array{x: int, y: int, aspect_ratio: float}
+ */
+function pprek24_get_post_thumbnail_meta (float $container_aspect, int | null $post_id = null): array {
+  if (is_null($post_id)) {
+    $post_id = get_the_ID();
+  }
+  $thumbnail_id = get_post_thumbnail_id($post_id);
+
+  if (!$thumbnail_id) {
+    return ['x' => 0, 'y' => 0];
+  }
+
+  $position = get_post_meta($post_id, 'pprek24_featured_image_focus_point', true);
+  $img_metadata = wp_get_attachment_metadata($thumbnail_id, 'full');
+
+  $width = $img_metadata['width'];
+  $height = $img_metadata['height'];
+
+  $img_aspect = $width / $height;
+
+  $scale_factor = $container_aspect / $img_aspect;
+
+  $x = $scale_factor < 1
+    ? min(max(50 + (($position[0] - 50) * (1 / $scale_factor)), 0), 100)
+    : $position[0];
+
+  $y = $scale_factor > 1
+    ? min(max(50 + (($position[1] - 50) * $scale_factor), 0), 100)
+    : $position[1];
+
+  return ['x' => $x, 'y' => $y];
+}
+
+/**
+ * @param float $container_aspect
+ * @param int|null $post_id
+ * @return string
+ */
+function pprek24_get_post_thumbnail_meta_css (float $container_aspect, int | null $post_id = null): string {
+  $meta = pprek24_get_post_thumbnail_meta($container_aspect, $post_id);
+
+  return esc_attr("--_pos-x: {$meta['x']}%; --_pos-y: {$meta['y']}%;");
+}
