@@ -9,7 +9,10 @@ const dev = process.argv.includes('--config-dev')
 
 export default [
   {
-    input: './assets/ts/app.ts',
+    input: [
+      './assets/ts/app.ts',
+      './assets/ts/post.ts'
+    ],
     output: {
       dir: './assets/js',
       format: 'esm',

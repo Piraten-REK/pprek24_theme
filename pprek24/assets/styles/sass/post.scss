@@ -1,0 +1,133 @@
+@use 'mixins';
+
+#main {
+  & > header {
+    h1 {
+      font-size: 2rem;
+      font-weight: 500;
+      margin-block: 2rem;
+    }
+
+    [role="complementary"] {
+      display: flex;
+      flex-direction: column;
+      gap: .35em;
+      color: var(--clr-txt-300);
+      font-size: .875rem;
+
+      & > div {
+        display: grid;
+        grid-template-columns: min-content minmax(0, 1fr);
+        justify-content: start;
+        gap: 0.5rem;
+        inline-size: 100%;
+      }
+
+      ul {
+        display: flex;
+        column-gap: 0.5rem;
+        flex-wrap: wrap;
+        max-inline-size: 100%;
+
+        li {
+          list-style-type: none;
+          display: inline-block;
+          max-inline-size: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      a {
+        @extend %link-no-color;
+      }
+    }
+  }
+
+  .post-content {
+    :not(code, pre) {
+      hyphens: auto;
+    }
+
+    & > * + * {
+      margin-block-start: 2rem;
+    }
+
+    a {
+      @extend %link;
+    }
+
+    blockquote {
+      background-color: var(--clr-accent-50);
+      padding: calc(var(--_padding-inline) * 2 / 3) var(--_padding-inline);
+      border-inline-start: .25em solid var(--clr-accent-400);
+      border-radius: .25em;
+      margin-inline: 2rem;
+    }
+
+    kbd {
+      display: inline-block;
+      background-color: var(--clr-txt-200);
+      padding: .2em .35em;
+      margin-inline: -.2em;
+      border-radius: .2rem;
+      filter: drop-shadow(0 .2em 0 var(--clr-txt-300));
+      font-family: var(--font-txt);
+      font-weight: 500;
+    }
+
+    :not(pre) code {
+      display: inline-block;
+      background-color: var(--clr-txt-200);
+      padding: .2em .35em;
+      margin-inline: -.2em;
+      border-radius: .2rem;
+      overflow: hidden;
+    }
+
+    pre:has(> code) {
+      border-radius: .2rem;
+      display: grid;
+      grid-template-columns: min-content minmax(0, 1fr);
+      max-inline-size: 100%;
+      overflow: hidden;
+
+      & > * {
+        padding: 1ch 1.5ch;
+      }
+
+      .code-block-line-number-wapper {
+        background-color: var(--clr-txt-200);
+        user-select: none;
+      }
+      
+      .code-block-line-number {
+        display: block;
+        text-align: end;
+      }
+
+      code {
+        background-color: var(--clr-txt-100);
+        overflow: scroll;
+      }
+
+      .code-block-content {
+        display: block;
+        white-space: pre;
+      }
+    }
+
+    sup, sub {
+      font-size: .75em;
+      line-height: 0;
+    }
+
+    sup.fn a {
+      text-decoration: none;
+
+      &:where(:hover, :focus-visible, :active) {
+        text-decoration: underline;
+      }
+    }
+  }
+}

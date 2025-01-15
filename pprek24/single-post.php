@@ -40,7 +40,7 @@
     </div>
   </div>
 </header>
-<section class="post-content">
+<section class="post-content full-width layout-inherit">
   <?php the_content(); ?>
 </section>
 

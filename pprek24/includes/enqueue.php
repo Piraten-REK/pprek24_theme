@@ -9,10 +9,11 @@ function pprek24_enqueue (): callable {
     'print'   =>  ['/assets/styles/print.css', 'media' => 'print'],
     '404'     =>  ['/assets/styles/404.css', 'condition' => fn () => is_404()],
     'home'    =>  ['/assets/styles/home.css', 'condition' => fn () => is_front_page()],
-    'single'  =>  ['/assets/styles/single.css', 'condition' => fn () => is_single()],
+    'post'    =>  ['/assets/styles/post.css', 'condition' => fn () => is_singular('post')],
   ];
   $scripts = [
-    'main_js' =>  '/assets/js/app.js'
+    'main_js' =>  '/assets/js/app.js',
+    'post_js' =>  ['/assets/js/post.js', 'condition' => fn () => is_singular('post')],
   ];
 
   global $pprek24_enqueued_styles;
@@ -85,6 +86,7 @@ function pprek24_enqueue (): callable {
     }
 
     foreach ($scripts as $handle => $src) {
+      $url = is_array($src) ? $src[0] : $src;
       $enqueue = is_array($src) && array_key_exists('condition', $src)
         ? is_callable($src['condition'])
           ? $src['condition']()
@@ -95,7 +97,7 @@ function pprek24_enqueue (): callable {
         continue;
       }
       
-      wp_register_script("pprek24_$handle", $uri . $src, [], $ver, [ 'strategy' => 'defer' ]);
+      wp_register_script("pprek24_$handle", $uri . $url, [], $ver, [ 'strategy' => 'defer' ]);
       wp_enqueue_script("pprek24_$handle");
     }
   };

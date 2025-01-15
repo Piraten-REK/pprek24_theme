@@ -1,5 +1,6 @@
 @use 'sass:map';
 @use 'colors';
+@use 'mixins';
 
 $bootstrap-icons-font-dir: '../fonts';
 @import '../../../node_modules/bootstrap-icons/font/bootstrap-icons';
@@ -113,11 +114,18 @@ main {
 
 :where(.layout) {
   --_padding-inline: var(--site-padding-inline);
+  --_width: 100%;
   display: grid;
-  grid-template-columns: [full-width-start breakout-left-start] var(--layout-padding-start, var(--_padding-inline)) [content-start breakout-right-start] 1fr [content-end breakout-left-end] var(--layout-padding-end, var(--_padding-inline)) [full-width-end breakout-right-end];
+  grid-template-columns: [full-width-start breakout-left-start] var(--layout-padding-start, var(--_padding-inline)) [content-start breakout-right-start] calc(var(--_width) - 2 * var(--_padding-inline)) [content-end breakout-left-end] var(--layout-padding-end, var(--_padding-inline)) [full-width-end breakout-right-end];
   grid-auto-rows: auto;
   justify-content: start;
   align-content: start;
+  inline-size: var(--_width);
+}
+:where(.layout-inherit) {
+  @extend .layout;
+  --_padding-inline: inherit;
+  --_width: inherit;
 }
 :where(.layout > *) {
   grid-column: content;
@@ -125,7 +133,10 @@ main {
 }
 .full-width {
   grid-column: full-width;
-  padding-inline: var(--layout-padding, var(--_padding-inline));
+
+  &:not(.layout) {
+    padding-inline: var(--layout-padding, var(--_padding-inline));
+  }
 }
 
 .breakout-start {
@@ -233,18 +244,7 @@ main {
 }
 
 .link {
-  &, &:where(:link, &:visited) {
-    color: var(--clr-accent-400);
-  }
-
-  &:where(:hover, :focus-visible, :active) {
-    color: var(--clr-accent-300);
-  }
-
-  &:focus-visible {
-    outline: var(--clr-accent-300) solid .125em;
-    outline-offset: .125em;
-  }
+  @extend %link;
 }
 
 :where(figure, img) {
@@ -256,3 +256,4 @@ main {
 @import 'footer';
 @import 'card';
 @import 'svelte';
+@import 'post';

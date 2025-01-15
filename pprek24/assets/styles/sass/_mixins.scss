@@ -15,3 +15,34 @@
     @content;
   }
 }
+
+%link {
+  &, &:where(:link, &:visited) {
+    color: var(--clr-accent-400);
+  }
+
+  &:where(:hover, :focus-visible, :active) {
+    color: var(--clr-accent-300);
+  }
+
+  &:focus-visible {
+    outline: var(--clr-accent-300) solid .125em;
+    outline-offset: .125em;
+  }
+}
+
+%link-no-color {
+  color: currentColor;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--clr-txt-400);
+    text-decoration: underline var(--clr-accent-400);
+  }
+
+  &:focus-visible {
+    color: var(--clr-txt-400);
+    outline: 0.0625rem solid var(--clr-accent-400);
+    outline-offset: .5em;
+  }
+}

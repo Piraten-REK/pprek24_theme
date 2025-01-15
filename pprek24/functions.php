@@ -6,6 +6,7 @@ const PPREK_DEV_MODE = true;
 // INCLUDES
 $includes = [
   'helpers',
+  'governance-post-type',
   'setup',
   'pprek-nav-walker',
   'primary-nav-walker',
@@ -27,6 +28,7 @@ add_action('customize_register', 'pprek24_customize_register');
 add_action('wp_enqueue_scripts', pprek24_enqueue());
 add_action('template_redirect', 'pprek24_template_redirect');
 add_action('enqueue_block_editor_assets', 'pprek24_enqueue_gutenberg_assets');
+add_action('add_meta_boxes_governance', 'pprek24_add_governance_editor_meta_box', 10, 1);
 
 add_filter('query_vars', 'pprek24_custom_query_vars');
 add_filter('document_title_parts', 'pprek24_modify_page_title', 10, 1);
