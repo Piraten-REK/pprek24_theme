@@ -252,6 +252,44 @@ main {
   max-inline-size: 100%;
 }
 
+.back-to-top {
+  --_shadow-opacity: 20%;
+  --_offset-right: clamp(2rem, 10dvb, 10dvi);
+  position: fixed;
+  inset: auto var(--_offset-right) 10dvb auto;
+  background-color: var(--clr-header-bg);
+  filter: drop-shadow(0 .15rem .5rem hsl(from #000 h s l / var(--_shadow-opacity)));
+  block-size: 3rem;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  color: var(--clr-accent-400);
+  font-size: 2rem;
+  translate: 0 0;
+  transition: display .3s, translate .3s ease, scale .15s ease, filter .15s ease;
+  transition-behavior: allow-discrete;
+
+  @starting-style {
+    translate: calc(var(--_offset-right) + 100% + .5rem) 0;
+  }
+
+  &::before {
+    @extend .bi;
+    content: map.get($bootstrap-icons-map, "arrow-up-short");
+  }
+
+  &:where(:hover, &:active, &:focus) {
+    --_shadow-opacity: 30%;
+    scale: 1.2;
+  }
+
+  &.hidden {
+    display: none;
+    translate: calc(var(--_offset-right) + 100% + .5rem) 0;
+  }
+}
+
 @import 'header';
 @import 'footer';
 @import 'card';

@@ -1,4 +1,5 @@
   </main>
+  <a href="#top" class="back-to-top hidden" aria-label="<?php esc_attr_e('Zum Beginn der Seite springen'); ?>" title="<?php esc_attr_e('Zurück nach oben'); ?>"></a>
   <footer class="site-footer">
     <div class="site-footer_top">
       <?php

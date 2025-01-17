@@ -43,3 +43,26 @@ if (config.calendar_api_url != null && config.calendar_api_url.trim().length >= 
     }
   })
 }
+
+// ----
+
+const btt = document.querySelector('.back-to-top') as HTMLAnchorElement
+
+function showBackToTopButton (): void {
+  const isShown = !btt.classList.contains('hidden')
+  const scrolled = window.scrollY
+  const windowHeight = window.innerHeight
+  const minScrolledToShow = Math.max(400, windowHeight * 0.4)
+
+  console.log({isShown, scrolled, windowHeight, minScrolledToShow})
+  
+  if (scrolled >= minScrolledToShow && !isShown) {
+    btt.classList.remove('hidden')
+  } else if (scrolled < minScrolledToShow && isShown) {
+    btt.classList.add('hidden')
+  }
+}
+
+window.addEventListener('scroll', showBackToTopButton)
+window.addEventListener('resize', showBackToTopButton)
+showBackToTopButton()
